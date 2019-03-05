@@ -6,20 +6,21 @@ maintainer: "Steffen Smolka <smolka@cs.cornell.edu>"
 authors: "Steffen Smolka <smolka@cs.cornell.edu>, Nate Foster <jnfoster@cs.cornell.edu>"
 license: "MIT"
 homepage: "https://github.com/netkat-lang/netkat"
-dev-repo: "git://github.com/netkat-lang/netkat.git"
+dev-repo: "git+https://github.com/netkat-lang/netkat.git"
 bug-reports: "https://github.com/netkat-lang/netkat/issues"
 
 
 build: [
   ["dune" "subst"] {pinned}
   ["dune" "build" "-p" name "-j" jobs]
+  ["dune" "runtest" "-p" name "-j" jobs] {with-test}
+  ["dune" "build" "@doc" "-p" name "-j" jobs] {with-doc}
 ]
 
-build-test: ["dune" "runtest" "-p" name]
-
-depdens: [
+depends: [
   "dune" {build}
   "base"
+  "bitstring"
   "ppx_jane"
   "ppx_inline_test"
 ]
