@@ -1,28 +1,21 @@
-(** Untyped NetKAT AST *)
+(** A concrete AST is obtained from the generic AST module by fixing:
+      - the type of extensions
+      - the type of "header values"
+*)
 
 open Base
 
-type header = string
-  [@@deriving sexp, compare, hash]
-type value = Bits.t
-  [@@deriving sexp, compare, hash]
-type mask = Bits.t
-  [@@deriving sexp, compare, hash]
+(* module Ext = Util.Uninhabited (* no extensions for now *) *)
+module Ext = struct
+  type t = Dup
+    [@@deriving sexp, compare, hash]
+end
+module Hv = struct
+  type t = string * int64
+    [@@deriving sexp, compare, hash]
+end
 
-type pred =
-  | True
-  | False
-  | Test of header * value * mask
-  | And of pred * pred
-  | Or of pred * pred
-  | Not of pred
-  [@@deriving sexp, compare, hash]
+module T = Generic_ast.Make_monomorph(Ext)(Hv)
+include T
 
-type pol =
-  | Match of pred
-  | Modify of header * value * mask
-  | Union of pol * pol
-  | Seq of pol * pol
-  | Star of pol
-  | Dup
-  [@@deriving sexp, compare, hash]
+let as_netkat : (t, Hv.t) Netkat.t = (module T)

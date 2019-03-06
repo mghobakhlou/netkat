@@ -1,0 +1,6 @@
+(library
+  (name util)
+  (public_name netkat.util)
+  (wrapped true)
+  (libraries base)
+)
