@@ -2,16 +2,16 @@
 
 open Base
 
-module type S = sig
+module type S0 = sig
   
   (** carrier of KAT *)
-  type t [@@deriving sexp, compare, hash]
+  type t
 
   (** carrier of BA *)
-  type b [@@deriving sexp, compare, hash]
+  type b
 
   (** header value *)
-  type hv [@@deriving sexp, compare, hash]
+  type hv
 
   (* pred is a Boolean algebra *)
   val tru : b
@@ -37,4 +37,20 @@ module type S = sig
 
 end
 
+module type S = sig
+  
+  (** carrier of KAT *)
+  type t [@@deriving sexp, compare, hash]
+
+  (** carrier of BA *)
+  type b [@@deriving sexp, compare, hash]
+
+  (** header value *)
+  type hv [@@deriving sexp, compare, hash]
+
+  include S0 with type t := t and type b := b and type hv := hv
+
+end
+
+type ('carrier, 'hv) t0 = (module S0 with type hv = 'hv and type t = 'carrier)
 type ('carrier, 'hv) t = (module S with type hv = 'hv and type t = 'carrier)

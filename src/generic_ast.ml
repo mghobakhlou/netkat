@@ -26,6 +26,7 @@ module T = struct
   let disj b c = Disj (b,c)
   let neg b = Neg b
 
+  let ext e = Ext e
   let filter b = Filter b
   let modify hv = Modify hv
   let union p q = Union (p,q)
@@ -37,7 +38,7 @@ include T
 
 (** unique homomorphism from initial algebra (ASTs) into any NetKAT model  *)
 let hom (type carrier) (type hv) (type ext)
-  ~(target : (carrier, hv) Netkat.t)
+  ~(target : (carrier, hv) Netkat.t0)
   ~(interp_ext : ext -> carrier)
   : (ext, hv) pol 
   -> carrier 
@@ -69,7 +70,7 @@ module M (Ext : Sig.T) (Hv : Sig.T) = struct
   type hv  = Hv.t [@@deriving sexp, compare, hash]
 end
 
-module Make_monomorph (Ext : Sig.T) (Hv : Sig.T) : Netkat.S with
+module Make_netkat (Ext : Sig.T) (Hv : Sig.T) : Netkat.S with
   type t = (Ext.t, Hv.t) pol and
   type b = Hv.t pred and
   type hv = Hv.t
@@ -77,3 +78,17 @@ module Make_monomorph (Ext : Sig.T) (Hv : Sig.T) : Netkat.S with
   include M(Ext)(Hv)
   include T
 end
+
+let translate_hvs (type hv1) (type hv2) (type ext)
+  ~(f: hv1 -> hv2)  (pol: (ext, hv1) pol) : (ext, hv2) pol
+=
+  let module Target = struct
+      type hv = hv1
+      type t = (ext, hv2) pol
+      type b = hv2 pred
+      include T
+      let test hv = test (f hv)
+      let modify hv = modify (f hv)
+    end
+  in
+  hom pol ~target:(module Target) ~interp_ext:T.ext

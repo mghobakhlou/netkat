@@ -19,10 +19,12 @@ and 'hv pred =
 (** a function 'ext -> 'carrier extends uniquely to a homomorphism 
     ('ext, 'hv) pol -> ('carrier, 'hv) Netkat.t
 *)
-val hom : target:(('carrier, 'hv) Netkat.t)
+val hom : target:(('carrier, 'hv) Netkat.t0)
        -> interp_ext:('ext -> 'carrier) 
        -> ('ext, 'hv) pol 
        -> 'carrier
+
+val translate_hvs : f:('hv1 -> 'hv2) -> ('ext, 'hv1) pol -> ('ext, 'hv2) pol
 
 module M : functor (Ext: Sig.T) -> functor (Hv: Sig.T) -> sig
   type t = (Ext.t, Hv.t) pol
@@ -31,7 +33,7 @@ module M : functor (Ext: Sig.T) -> functor (Hv: Sig.T) -> sig
     [@@deriving sexp, compare, hash]
 end
 
-module Make_monomorph : functor (Ext : Sig.T) -> functor (Hv : Sig.T) -> 
+module Make_netkat : functor (Ext : Sig.T) -> functor (Hv : Sig.T) ->
   Netkat.S with
     type t = (Ext.t, Hv.t) pol and
     type b = Hv.t pred and
