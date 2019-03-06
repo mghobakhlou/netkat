@@ -1,4 +1,4 @@
-(** NetKAT: algebraic struxcture *)
+(** NetKAT: algebraic structure *)
 
 open Base
 
