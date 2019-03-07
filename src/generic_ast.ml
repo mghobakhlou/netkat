@@ -1,4 +1,4 @@
-(** Untyped NetKAT AST *)
+(** Generic NetKAT AST *)
 
 open Base
 
@@ -37,8 +37,8 @@ include T
 
 
 (** unique homomorphism from initial algebra (ASTs) into any NetKAT model  *)
-let hom (type carrier) (type hv) (type ext)
-  ~(target : (carrier, hv) Netkat.t0)
+let hom (type carrier hv ext)
+  ~(target : (carrier, hv) Netkat.t)
   ~(interp_ext : ext -> carrier)
   : (ext, hv) pol 
   -> carrier 
@@ -70,7 +70,7 @@ module M (Ext : Sig.T) (Hv : Sig.T) = struct
   type hv  = Hv.t [@@deriving sexp, compare, hash]
 end
 
-module Make_netkat (Ext : Sig.T) (Hv : Sig.T) : Netkat.S with
+module Make_netkat (Ext : Sig.T) (Hv : Sig.T) : Netkat.S' with
   type t = (Ext.t, Hv.t) pol and
   type b = Hv.t pred and
   type hv = Hv.t

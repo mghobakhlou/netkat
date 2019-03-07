@@ -2,7 +2,7 @@
 
 open Base
 
-module type S0 = sig
+module type S = sig
   
   (** carrier of KAT *)
   type t
@@ -37,7 +37,7 @@ module type S0 = sig
 
 end
 
-module type S = sig
+module type S' = sig
   
   (** carrier of KAT *)
   type t [@@deriving sexp, compare, hash]
@@ -48,9 +48,9 @@ module type S = sig
   (** header value *)
   type hv [@@deriving sexp, compare, hash]
 
-  include S0 with type t := t and type b := b and type hv := hv
+  include S with type t := t and type b := b and type hv := hv
 
 end
 
-type ('carrier, 'hv) t0 = (module S0 with type hv = 'hv and type t = 'carrier)
 type ('carrier, 'hv) t = (module S with type hv = 'hv and type t = 'carrier)
+type ('carrier, 'hv) t' = (module S' with type hv = 'hv and type t = 'carrier)
