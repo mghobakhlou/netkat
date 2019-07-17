@@ -5,7 +5,6 @@
   (libraries
     base
     netkat
-    netkat.util
     idd
   )
   (preprocess (pps

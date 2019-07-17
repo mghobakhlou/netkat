@@ -1,5 +1,4 @@
 open Netkat_
-open Util
 
 type hv = { name: string; value: bool }
 type expr = (Uninhabited.t, hv) Generic_ast.pol
