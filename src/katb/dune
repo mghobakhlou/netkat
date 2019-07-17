@@ -1,6 +1,6 @@
 (library
-  (name katb)
-  (public_name netkat.katb)
+  (name katblib)
+  (public_name netkat.katblib)
   (wrapped true)
   (libraries
     base

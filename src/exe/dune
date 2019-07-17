@@ -1,0 +1,4 @@
+(executable
+ (name katb)
+ (public_name netkat.katb)
+ (libraries core netkat.katblib idd))
