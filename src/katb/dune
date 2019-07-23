@@ -5,7 +5,7 @@
   (libraries
     base
     netkat
-    idd
+    idds
   )
   (preprocess (pps
     ppx_jane
