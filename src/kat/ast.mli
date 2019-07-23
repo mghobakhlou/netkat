@@ -1,6 +1,8 @@
 (** Generic AST for Kleene Algebra with Tests (KAT). *)
 
 
+(** {2 Expressions} *)
+
 (** Boolean expressions, paramerized by primitive tests ['test]. *)
 type 'test bexp =
   | True
@@ -20,3 +22,13 @@ type ('act, 'test) exp =
   | Star of ('act, 'test) exp
   [@@deriving sexp, compare, equal, hash]
 
+
+(** {2 Homomorphisms} *)
+
+val interp_bexp :
+  ba:'b Sig.ba -> interp_test:('test -> 'b)
+  -> 'test bexp -> 'b
+
+val interp_exp :
+  kat:('k,'b) Sig.kat -> interp_test:('test -> 'b) -> interp_act:('act -> 'k) 
+  -> ('act, 'test) exp -> 'k
