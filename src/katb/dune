@@ -7,9 +7,9 @@
   (wrapped true)
   (libraries
     base
-    netkat
     idds
-    parsing
+    netkat.kat
+    netkat.parsing
   )
   (preprocess (pps
     ppx_jane

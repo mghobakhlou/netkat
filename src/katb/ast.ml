@@ -1,5 +1,7 @@
-open Netkat_
+open Base
 
-type hv = { name: string; value: bool }
-type expr = (Uninhabited.t, hv) Generic_ast.pol
-type bexpr = hv Generic_ast.pred
+type test = { var: string; value: bool }
+and act = test
+and bexp = test Kat.Ast.bexp
+and exp = (act, test) Kat.Ast.exp
+  [@@deriving sexp, compare, equal, hash]

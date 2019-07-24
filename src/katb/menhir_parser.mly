@@ -1,24 +1,37 @@
 %{
-(* OCaml preamble *)
-(* open Base *)
+  open Base
 %}
 
 (* tokens *)
 %token LPAR RPAR EOF
+%token <string> VAR
+%token BANG QMARK TILDE TICK
+%token PLUS SCOLON STAR
+(* %token TRUE FALSE SKIP ABORT *)
+%token ZERO ONE
 
-%start <unit> ast_eof
+%start <Ast.bexp> bexp_eof
+%start <Ast.exp> exp_eof
 
 %%
 
-ast_eof:
-  | ast; EOF { () }
+exp_eof:
+  | e=exp; EOF { e }
   ;
 
-ast:
-  | nested+ { () }
+exp:
+  | ONE { Kat.Optimize.skip }
+  | ZERO { Kat.Optimize.abort }
+  | b=bexp { Kat.Optimize.assrt b }
 
-nested:
-  | LPAR; nested*; RPAR { () }
+bexp_eof:
+  | b=bexp; EOF { b }
   ;
+
+bexp:
+  | ONE { Kat.Optimize.ctrue }
+  | ZERO { Kat.Optimize.cfalse }
+  | var=VAR; has_tick=option(TICK); QMARK
+    { Kat.Ast.Test Ast.{ var; value = Option.is_none has_tick } }
 
 %%

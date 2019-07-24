@@ -1,4 +1,6 @@
 (executable
  (name katb)
  (public_name netkat.katb)
- (libraries core netkat.katblib idds))
+ (libraries core netkat.katblib idds)
+ (preprocess (pps ppx_jane))
+ )

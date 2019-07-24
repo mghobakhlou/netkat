@@ -11,6 +11,7 @@ let[@inline] illegal c =
 
 let whitespace = ' ' | '\t'
 let newline = "\r\n" | '\r' | '\n'
+let ident = ['A'-'Z' 'a'-'z'] ['A'-'Z' 'a'-'z' '0'-'9' '_']*
 
 rule next_token = parse
   | whitespace+
@@ -21,8 +22,14 @@ rule next_token = parse
     { comment 0 lexbuf; next_token lexbuf }
 
   (* actual tokens here *)
+  | "0" { ZERO }
+  | "1" { ONE }
+  | "'" { TICK }
+  | '?' { QMARK }
+  | '!' { BANG }
   | '(' { LPAR }
   | ')' { RPAR }
+  | ident as var { VAR var }
 
   (* EOF/illegal token *)
   | eof { EOF }

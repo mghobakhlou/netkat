@@ -6,8 +6,8 @@ open Katblib
 (* UTILITY FUNCTIONS                                                         *)
 (*===========================================================================*)
 
-let parse_expr (expr : [`File of string | `String of string]) =
-  match expr with
+let parse_exp (exp : [`File of string | `String of string]) =
+  match exp with
   | `File f -> Parser.parse_file f
   | `String s -> Parser.parse_string s
 
@@ -47,10 +47,12 @@ module Idd = struct
 
   let run file_or_str stdin () =
     Parser.pp_exceptions ();
-    let expr =
-      parse_expr (if stdin then `String file_or_str else `File file_or_str)
+    let exp =
+      parse_exp (if stdin then `String file_or_str else `File file_or_str)
     in
-    printf "parsing succeeded!"
+    printf "parsing succeeded!\n";
+    printf !"-> %{sexp:Ast.exp}" exp
+
 (*     let (time, idd) = time (fun () -> failwith "todo") in
     printf "%s\n" (Dd.to_string (idd :> Dd.t));
     print_time time;
@@ -69,10 +71,10 @@ module Equiv = struct
 
   let run file_or_expr1 file_or_expr2 stdin () =
     let expr1 =
-      parse_expr (if stdin then `String file_or_expr1 else `File file_or_expr1)
+      parse_exp (if stdin then `String file_or_expr1 else `File file_or_expr1)
     in
     let expr2 =
-      parse_expr (if stdin then `String file_or_expr1 else `File file_or_expr2)
+      parse_exp (if stdin then `String file_or_expr1 else `File file_or_expr2)
     in
     if failwith "todo" then
       printf "true\n"
