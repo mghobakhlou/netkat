@@ -1,3 +1,6 @@
+(ocamllex (modules lexer))
+(menhir (modules menhir_parser))
+
 (library
   (name katblib)
   (public_name netkat.katblib)
@@ -6,6 +9,7 @@
     base
     netkat
     idds
+    parsing
   )
   (preprocess (pps
     ppx_jane

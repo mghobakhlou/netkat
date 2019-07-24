@@ -37,3 +37,4 @@ and comment nesting = parse
     { failwith "[lexer] unterminated comment at EOF" }
   | _
     { comment nesting lexbuf }
+

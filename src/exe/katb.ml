@@ -7,10 +7,9 @@ open Katblib
 (*===========================================================================*)
 
 let parse_expr (expr : [`File of string | `String of string]) =
-  failwith "todo"
-(*   match expr with
-  | `String s -> Netkat.Parser.pol_of_string s
-  | `File file -> Netkat.Parser.pol_of_file file *)
+  match expr with
+  | `File f -> Parser.parse_file f
+  | `String s -> Parser.parse_string s
 
 let time f =
   let t1 = Unix.gettimeofday () in
@@ -46,14 +45,16 @@ module Idd = struct
     +> Flag.stdin
   )
 
-  let run file_or_expr stdin () =
+  let run file_or_str stdin () =
+    Parser.pp_exceptions ();
     let expr =
-      parse_expr (if stdin then `String file_or_expr else `File file_or_expr)
+      parse_expr (if stdin then `String file_or_str else `File file_or_str)
     in
-    let (time, idd) = time (fun () -> failwith "todo") in
+    printf "parsing succeeded!"
+(*     let (time, idd) = time (fun () -> failwith "todo") in
     printf "%s\n" (Dd.to_string (idd :> Dd.t));
     print_time time;
-    failwith "todo"
+    failwith "todo" *)
 
 end
 
@@ -88,7 +89,7 @@ end
 
 let idd : Command.t =
   Command.basic_spec
-    ~summary:"Converts program to IDD and dumps it."
+    ~summary:"Converts program to IDD and renders it."
     Idd.spec
     Idd.run
 
