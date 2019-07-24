@@ -29,6 +29,10 @@ rule next_token = parse
   | '!' { BANG }
   | '(' { LPAR }
   | ')' { RPAR }
+  | '+' { PLUS }
+  | ';' { SCOLON }
+  | '~' { TILDE }
+  | '*' { STAR }
   | ident as var { VAR var }
 
   (* EOF/illegal token *)
