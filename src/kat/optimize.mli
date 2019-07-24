@@ -23,6 +23,9 @@ val union : ('act, 'test) exp -> ('act, 'test) exp -> ('act, 'test) exp
 val seq : ('act, 'test) exp -> ('act, 'test) exp -> ('act, 'test) exp
 val star : ('act, 'test) exp -> ('act, 'test) exp
 
+val ite : 'test bexp -> ('act, 'test) exp -> ('act, 'test) exp -> ('act, 'test) exp
+
+
 
 (** {1 Algebraic optimization}  *)
 

@@ -8,8 +8,10 @@
 %token PLUS SCOLON STAR
 (* %token TRUE FALSE SKIP ABORT *)
 %token ZERO ONE
+%token IF THEN ELSE
 
 (* precedence and associativity - from lowest to highest *)
+%nonassoc ELSE
 %nonassoc low
 %left PLUS
 %left SCOLON
@@ -37,6 +39,9 @@ exp:
     { Kat.Optimize.seq e1 e2 }
   | e=exp; STAR
     { Kat.Ast.Star e }
+  | IF; b=bexp; THEN; e1=exp; ELSE; e2=exp
+    { Kat.Optimize.ite b e1 e2 }
+  | LPAR; e=exp; RPAR { e }
 
 
 bexp_eof:

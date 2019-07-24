@@ -19,22 +19,22 @@ let get_kat mgr = {
     star = Idd.star mgr;
   }
 
-(** [interp_test_mgr mgr interp_fields test] is the BDD resulting from testing
-    the variable specificed by [interp_fields test.name] according to
+(** [interp_test_mgr mgr interp_var test] is the BDD resulting from testing
+    the variable specificed by [interp_var test.name] according to
     [test.value] *)
-let interp_test_mgr mgr interp_fields ({ var; value }: Ast.test) =
-  Bdd.test mgr (Var.inp (interp_fields var)) value
+let interp_test_mgr mgr interp_var ({ var; value }: Ast.test) =
+  Bdd.test mgr (Var.inp (interp_var var)) value
 
-let compile_bexp mgr ~interp_fields bexp =
+let compile_bexp ~mgr ~interp_var bexp =
   let ba = get_ba mgr in
-  let interp_test = interp_test_mgr mgr interp_fields in
+  let interp_test = interp_test_mgr mgr interp_var in
   interp_bexp ~ba ~interp_test bexp
 
-let compile_exp mgr ~interp_fields exp =
+let compile_exp ~mgr ~interp_var exp =
   let kat = get_kat mgr in
   let bdd_mgr = Idd.get_bdd_manager mgr in
-  let interp_test = interp_test_mgr bdd_mgr interp_fields in
+  let interp_test = interp_test_mgr bdd_mgr interp_var in
   let interp_act ({ var; value }: Ast.act) =
-    Idd.set mgr (interp_fields var) value
+    Idd.set mgr (interp_var var) value
   in
   interp_exp ~kat ~interp_test ~interp_act exp

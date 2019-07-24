@@ -33,6 +33,9 @@ rule next_token = parse
   | ';' { SCOLON }
   | '~' { TILDE }
   | '*' { STAR }
+  | "if" { IF }
+  | "then" { THEN }
+  | "else" { ELSE }
   | ident as var { VAR var }
 
   (* EOF/illegal token *)

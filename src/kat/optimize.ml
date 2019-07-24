@@ -58,6 +58,9 @@ let star e =
   | Star _ -> e
   | _ -> Star e
 
+let ite b e1 e2 =
+  union (seq (assrt b) e1) (seq (assrt (neg b)) e2)
+
 
 let optimize_bexp ?(negate=false) b =
   let rec opt neg = function
