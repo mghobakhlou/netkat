@@ -24,7 +24,7 @@ rule next_token = parse
   (* actual tokens here *)
   | "0" { ZERO }
   | "1" { ONE }
-  | "'" { TICK }
+  | "`" { BTICK }
   | '?' { QMARK }
   | '!' { BANG }
   | '(' { LPAR }
