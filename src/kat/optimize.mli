@@ -31,3 +31,16 @@ val ite : 'test bexp -> ('act, 'test) exp -> ('act, 'test) exp -> ('act, 'test) 
 
 val optimize_bexp : ?negate:bool -> 'test bexp -> 'test bexp
 val optimize_exp : ('act, 'test) exp -> ('act, 'test) exp
+
+
+(** Given an [e: exp] in which union and seq associate strictly to the right,
+    returns normalized expression [normalize_rassoc_exp e] such that:
+    - union and seq associative strictly to the left
+    - boolean expressions expand as far as possible in the following sense:
+      - [assert b1; assert b2]  ~>  [assert (b1; b2)]
+      - [assert b1 + assert b2]  ~>  [assert (b1 + b2)]
+
+    @raise Invalid_argument if input expression is not strictly
+      right-associative.
+*)
+val normalize_rassoc_exp : ('act, 'test) exp -> ('act, 'test) exp

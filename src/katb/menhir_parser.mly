@@ -17,16 +17,11 @@
 %nonassoc STAR
 
 %start <Ast.exp> exp_eof
-%start <Ast.bexp> bexp_eof
 
 %%
 
 exp_eof:
-  | e=exp; EOF { e }
-  ;
-
-bexp_eof:
-  | b=bexp; EOF { b }
+  | e=exp; EOF { Kat.Optimize.normalize_rassoc_exp e }
   ;
 
 exp:
@@ -36,8 +31,8 @@ exp:
     { Kat.Optimize.seq e1 e2 }
   | e=exp; STAR
     { Kat.Ast.Star e }
-  | var=VAR; has_tick=option(BTICK); BANG
-    { Kat.Ast.Action Ast.{ var; value = Option.is_none has_tick } }
+  | var=VAR; has_tick=boption(BTICK); BANG
+    { Kat.Ast.Action Ast.{ var; value = not has_tick } }
   | IF; b=bexp; THEN; e1=exp; ELSE; e2=exp { Kat.Optimize.ite b e1 e2 }
   | LPAR; e=exp; RPAR {e}
   | b=bexpRest { Kat.Optimize.assrt b }
@@ -54,8 +49,8 @@ bexp:
 bexpRest:
   | ONE { Kat.Optimize.ctrue }
   | ZERO { Kat.Optimize.cfalse }
-  | var=VAR; has_tick=option(BTICK); QMARK
-    { Kat.Ast.Test Ast.{ var; value = Option.is_none has_tick } }
+  | var=VAR; has_tick=boption(BTICK); QMARK
+    { Kat.Ast.Test Ast.{ var; value = not has_tick } }
   | TILDE; b=bexpRest { Kat.Ast.Neg b }
   | TILDE; LPAR; b=bexp ; RPAR { Kat.Ast.Neg b }
   ;

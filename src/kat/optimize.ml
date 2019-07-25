@@ -80,3 +80,66 @@ let rec optimize_exp e =
   | Union (e1, e2) -> union (optimize_exp e1) (optimize_exp e2)
   | Seq (e1, e2) -> seq (optimize_exp e1) (optimize_exp e2)
   | Star e -> star (optimize_exp e)
+
+
+let rec bexp2_to_bexpn (b : 'test bexp) : 'test Nary.bexp =
+  match b with
+  | True -> Conj []
+  | False -> Disj []
+  | Test t -> Test t
+  | Conj (b1, b2) ->
+    Conj [bexp2_to_bexpn b1; bexp2_to_bexpn b2]
+  | Disj (b1, b2) ->
+    Disj [bexp2_to_bexpn b1; bexp2_to_bexpn b2]
+  | Neg b -> Neg (bexp2_to_bexpn b)
+
+let rec exp2_to_expn (e : ('act,'test) exp) : ('act,'test) Nary.exp =
+  match e with
+  | Assert b -> Assert (bexp2_to_bexpn b)
+  | Action a -> Action a
+  | Union (e1, e2) ->
+    begin match exp2_to_expn e1, exp2_to_expn e2 with
+    | Assert b1, Assert b2 ->
+      Assert (Disj [b1;b2])
+    | Assert b1, Union (Assert b2 :: es) ->
+      Union (Assert (Disj [b1;b2]) :: es)
+    | Union _, _ ->
+      invalid_arg "union: not right-associative!"
+    | e1, Union es -> Union (e1::es)
+    | e1, e2 -> Union [e1; e2]
+    end
+  | Seq (e1, e2) ->
+    begin match exp2_to_expn e1, exp2_to_expn e2 with
+    | Assert b1, Assert b2 ->
+      Assert (Conj [b1;b2])
+    | Assert b1, Seq (Assert b2 :: es) ->
+      Seq (Assert (Conj [b1;b2]) :: es)
+    | Seq _, _ ->
+      invalid_arg "seq: not right-associative!"
+    | e1, Seq es -> Seq (e1::es)
+    | e1, e2 -> Seq [e1; e2]
+    end
+  | Star e -> Star (exp2_to_expn e)
+
+
+let rec bexpn_to_bexp2 (b : 'test Nary.bexp) : 'test bexp =
+  match b with
+  | Test t -> Test t
+  | Conj bs ->
+    List.fold bs ~init:ctrue ~f:(fun c b -> conj c (bexpn_to_bexp2 b))
+  | Disj bs ->
+    List.fold bs ~init:cfalse ~f:(fun c b -> disj c (bexpn_to_bexp2 b))
+  | Neg b -> neg (bexpn_to_bexp2 b)
+
+let rec expn_to_exp2 (e : ('act, 'test) Nary.exp) : ('act, 'test) exp =
+  match e with
+  | Assert b -> assrt (bexpn_to_bexp2 b)
+  | Action a -> Action a
+  | Union es ->
+    List.fold es ~init:abort ~f:(fun f e -> union f (expn_to_exp2 e))
+  | Seq es ->
+    List.fold es ~init:skip ~f:(fun f e -> seq f (expn_to_exp2 e))
+  | Star e -> star (expn_to_exp2 e)
+
+let normalize_rassoc_exp e =
+  expn_to_exp2 (exp2_to_expn e)
