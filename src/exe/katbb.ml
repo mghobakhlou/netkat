@@ -1,6 +1,6 @@
 open Core
 open Idds
-open Katblib
+open Katbb_lib
 
 (*===========================================================================*)
 (* UTILITY FUNCTIONS                                                         *)
@@ -15,13 +15,13 @@ let compile_exp ?mgr (exp : Ast.exp) : Idd.t * int Hashtbl.M(String).t * Idd.man
   let mgr = match mgr with Some mgr -> mgr | None -> Idd.manager () in
   let tbl : int Hashtbl.M(String).t = Hashtbl.create (module String) in
   let next = ref (-1) in
-  let interp_var var =
+  let map_var var =
     Hashtbl.find_or_add tbl var ~default:(fun () ->
       incr next;
       !next
     )
   in
-  let idd = Idd_compiler.compile_exp ~mgr ~interp_var exp in
+  let idd = Idd_compiler.compile_exp ~mgr ~map_var exp in
   idd, tbl, mgr
 
 let time f =
@@ -66,11 +66,11 @@ module Idd = struct
     printf "parsing succeeded!\n";
     printf !"-> %{sexp:Ast.exp}\n" exp;
 
-    let (time, (idd, interp_var, mgr)) = time (fun () -> compile_exp exp) in
+    let (time, (idd, map_var, mgr)) = time (fun () -> compile_exp exp) in
     printf "%s\n" (Dd.to_string (idd :> Dd.t));
     print_time time;
     let var_name_tbl =
-      Hashtbl.to_alist interp_var
+      Hashtbl.to_alist map_var
       |> List.map ~f:(fun (x,y) -> y,x)
       |> Hashtbl.of_alist_exn (module Int)
     in

@@ -32,23 +32,23 @@ also induces an interpretation ['test bexp -> 'b] of Boolean expressions
 as elements in ['b], provided ['b] carries a Boolean algebra structure.
 
 More formally, for each Boolean algebra [ba: 'b ba] on ['b], any
-interpretation of primitive tests [interp_test : 'test -> 'b] extends
+interpretation of primitive tests [map_test : 'test -> 'b] extends
 uniquely to a homomorphism from the initial algebra ['test bexp] to ['b];
 the homomomorphism is given by 
-[interp_bexp ~ba ~interp_test : 'test bexp -> 'b].
+[map_bexp ~ba ~map_test : 'test bexp -> 'b].
 
 The sitatuion for a KAT [kat: ('k,'b) kat] on ['k] and ['b] is similar. Given
-+ an interpretation [interp_test : 'test -> 'b] of primitive tests as elements in ['b]; and
-+ an interpretation [interp_act : 'act -> 'k] of actions as elements in ['k];
++ an interpretation [map_test : 'test -> 'b] of primitive tests as elements in ['b]; and
++ an interpretation [map_act : 'act -> 'k] of actions as elements in ['k];
 
 the unique homomorphism from KAT expressions [('act,'test) exp] to ['k] is
-given by [interp_exp ~kat ~interp_test ~interp_act: ('act,'test) exp -> 'k].
+given by [map_exp ~kat ~map_test ~map_act: ('act,'test) exp -> 'k].
 *)
 
-val interp_bexp :
-  ba:'b ba -> interp_test:('test -> 'b)
+val map_bexp :
+  ba:'b ba -> map_test:('test -> 'b)
   -> 'test Ast.bexp -> 'b
 
-val interp_exp :
-  kat:('k,'b) kat -> interp_test:('test -> 'b) -> interp_act:('act -> 'k) 
+val map_exp :
+  kat:('k,'b) kat -> map_test:('test -> 'b) -> map_act:('act -> 'k) 
   -> ('act, 'test) Ast.exp -> 'k

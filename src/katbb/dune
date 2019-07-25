@@ -2,8 +2,8 @@
 (menhir (modules menhir_parser))
 
 (library
-  (name katblib)
-  (public_name netkat.katblib)
+  (name katbb_lib)
+  (public_name netkat.katbb_lib)
   (wrapped true)
   (libraries
     base

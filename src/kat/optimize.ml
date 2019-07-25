@@ -87,10 +87,8 @@ let rec bexp2_to_bexpn (b : 'test bexp) : 'test Nary.bexp =
   | True -> Conj []
   | False -> Disj []
   | Test t -> Test t
-  | Conj (b1, b2) ->
-    Conj [bexp2_to_bexpn b1; bexp2_to_bexpn b2]
-  | Disj (b1, b2) ->
-    Disj [bexp2_to_bexpn b1; bexp2_to_bexpn b2]
+  | Conj (b1, b2) -> Conj [bexp2_to_bexpn b1; bexp2_to_bexpn b2]
+  | Disj (b1, b2) -> Disj [bexp2_to_bexpn b1; bexp2_to_bexpn b2]
   | Neg b -> Neg (bexp2_to_bexpn b)
 
 let rec exp2_to_expn (e : ('act,'test) exp) : ('act,'test) Nary.exp =
