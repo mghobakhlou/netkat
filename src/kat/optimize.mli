@@ -14,11 +14,13 @@ val abort : ('act, 'test) exp
 
 (** {1 (Optimizing) smart constructors}  *)
 
-val conj : 'test bexp -> 'test bexp -> 'test bexp
+val test : 'test -> 'test bexp
 val disj : 'test bexp -> 'test bexp -> 'test bexp
+val conj : 'test bexp -> 'test bexp -> 'test bexp
 val neg : 'test bexp -> 'test bexp
 
 val assrt : 'test bexp -> ('act, 'test) exp
+val action : 'act -> ('act, 'test) exp
 val union : ('act, 'test) exp -> ('act, 'test) exp -> ('act, 'test) exp
 val seq : ('act, 'test) exp -> ('act, 'test) exp -> ('act, 'test) exp
 val star : ('act, 'test) exp -> ('act, 'test) exp

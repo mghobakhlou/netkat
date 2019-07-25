@@ -1,17 +1,16 @@
-%{
-%}
-
 (* tokens *)
 %token LPAR RPAR EOF
 %token <string> VAR
 %token BANG QMARK TILDE BTICK
 %token PLUS SCOLON STAR
-(* %token TRUE FALSE SKIP ABORT *)
 %token ZERO ONE
 %token IF THEN ELSE
 
-(* precedence and associativity - from lowest to highest *)
+(* Precedence and associativity - from lowest to highest. *)
 %nonassoc ELSE
+(* We parse + and ; in a right-associative fashion initially; this allows
+   Kat.Optimize.normalize_rassoc_exp to normalize the resulting expression
+   in linear time. (Normalization would be quadratic-time otherwise.) *)
 %right PLUS
 %right SCOLON
 %nonassoc STAR
@@ -30,10 +29,11 @@ exp:
   | e1=exp; SCOLON; e2=exp
     { Kat.Optimize.seq e1 e2 }
   | e=exp; STAR
-    { Kat.Ast.Star e }
+    { Kat.Optimize.star e }
   | var=VAR; has_tick=boption(BTICK); BANG
-    { Kat.Ast.Action Ast.{ var; value = not has_tick } }
-  | IF; b=bexp; THEN; e1=exp; ELSE; e2=exp { Kat.Optimize.ite b e1 e2 }
+    { Kat.Optimize.action Ast.{ var; value = not has_tick } }
+  | IF; b=bexp; THEN; e1=exp; ELSE; e2=exp
+    { Kat.Optimize.ite b e1 e2 }
   | LPAR; e=exp; RPAR {e}
   | b=bexpRest { Kat.Optimize.assrt b }
   ;
@@ -50,9 +50,9 @@ bexpRest:
   | ONE { Kat.Optimize.ctrue }
   | ZERO { Kat.Optimize.cfalse }
   | var=VAR; has_tick=boption(BTICK); QMARK
-    { Kat.Ast.Test Ast.{ var; value = not has_tick } }
-  | TILDE; b=bexpRest { Kat.Ast.Neg b }
-  | TILDE; LPAR; b=bexp ; RPAR { Kat.Ast.Neg b }
+    { Kat.Optimize.test Ast.{ var; value = not has_tick } }
+  | TILDE; b=bexpRest { Kat.Optimize.neg b }
+  | TILDE; LPAR; b=bexp ; RPAR { Kat.Optimize.neg b }
   ;
 
 %%
