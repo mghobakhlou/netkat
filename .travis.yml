@@ -6,6 +6,7 @@ install: wget https://raw.githubusercontent.com/ocaml/ocaml-ci-scripts/master/.t
 script: bash ./.travis-docker.sh
 env:
  global:
-   - PRE_INSTALL_HOOK="opam pin add --no-action -y idds https://github.com/netkat-lang/idds.git"
+   - PINS="idds:https://github.com/netkat-lang/idds.git"
+   - TESTS=true
  matrix:
    - DISTRO=ubuntu OCAML_VERSION=4.08
