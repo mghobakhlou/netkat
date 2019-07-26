@@ -1,5 +1,3 @@
-open Base
-
 type 'b ba = {
   ctrue : 'b;
   cfalse : 'b;

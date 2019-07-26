@@ -66,7 +66,7 @@ module Idd = struct
     printf "parsing succeeded!\n";
     printf !"-> %{sexp:Ast.exp}\n" exp;
 
-    let (time, (idd, map_var, mgr)) = time (fun () -> compile_exp exp) in
+    let (time, (idd, map_var, _mgr)) = time (fun () -> compile_exp exp) in
     printf "%s\n" (Dd.to_string (idd :> Dd.t));
     print_time time;
     let var_name_tbl =
