@@ -64,20 +64,24 @@ let ite b e1 e2 =
   union (seq (assrt b) e1) (seq (assrt (neg b)) e2)
 
 
-let optimize_bexp ?(negate=false) b =
+let optimize_bexp ?(negate=false) ?neg_test b =
+  let neg_test = match neg_test with
+    | Some f -> fun t -> Test (f t)
+    | None -> fun t -> Neg (Test t)
+  in
   let rec opt neg = function
     | True -> if neg then cfalse else ctrue
     | False -> if neg then ctrue else cfalse
-    | Test _ as b -> if neg then (Neg b) else b
+    | Test t as b -> if neg then neg_test t else b
     | Conj (b1, b2) -> conj (opt neg b1) (opt neg b2)
     | Disj (b1, b2) -> disj (opt neg b1) (opt neg b2)
     | Neg b -> opt (not neg) b
   in
   opt negate b
 
-let rec optimize_exp e =
+let rec optimize_exp ?neg_test e =
   match e with
-  | Assert b -> assrt (optimize_bexp b)
+  | Assert b -> assrt (optimize_bexp ?neg_test b)
   | Action _ -> e
   | Union (e1, e2) -> union (optimize_exp e1) (optimize_exp e2)
   | Seq (e1, e2) -> seq (optimize_exp e1) (optimize_exp e2)

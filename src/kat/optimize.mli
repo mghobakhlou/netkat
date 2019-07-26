@@ -31,8 +31,8 @@ val ite : 'test bexp -> ('act, 'test) exp -> ('act, 'test) exp -> ('act, 'test) 
 
 (** {1 Algebraic optimization}  *)
 
-val optimize_bexp : ?negate:bool -> 'test bexp -> 'test bexp
-val optimize_exp : ('act, 'test) exp -> ('act, 'test) exp
+val optimize_bexp : ?negate:bool -> ?neg_test:('test -> 'test) -> 'test bexp -> 'test bexp
+val optimize_exp : ?neg_test:('test -> 'test) -> ('act, 'test) exp -> ('act, 'test) exp
 
 
 (** Given an [e: exp] in which union and seq associate strictly to the right,
