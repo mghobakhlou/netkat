@@ -1,12 +1,26 @@
 language: c
-sudo: false
-services:
-  - docker
-install: wget https://raw.githubusercontent.com/ocaml/ocaml-ci-scripts/master/.travis-docker.sh
-script: bash ./.travis-docker.sh
+cache:
+  directories:
+  - "/home/travis/.opam/"
 env:
- global:
-   - PINS="idds:https://github.com/netkat-lang/idds.git"
-   - TESTS=true
- matrix:
-   - DISTRO=ubuntu OCAML_VERSION=4.08
+  global:
+  - PACKAGE=netkat
+  - DEPNAME=idds
+  - DEPREPO=https://github.com/netkat-lang/idds.git
+  - secure: iQc2E0pWXMs+XvZKOEtj+DyfSkMvGykewggP6EfJvsGwOmY7qq5NO4EgeaJkIhPiVGqj9arbwkvvm0qJhH19pAzZYuOLDfQ/pHnmlYw+W/LIMZk/qj2aTuWDUMqdHzKRyVpUpgQdipG3fGNegBQP/9q+uNNXXJeVIjgVdxzc0MAdznTwISSvHKWrOIeR3kLHIqh4rDwj16FFWH/WlV8UWwBDX2bK05N/ZyDHfCOhr/TMvANfO4M/yC/Vluv0dZWls91e3aCTTpuoZ9IyvfNK/LP8oPdlElmLFr62fk2nEFk8e6bmHk3cEbH+JNQjvTlGB+Rml99baQZqtgS5egMQEItkgX8Ie1gXHGb0l71zav2nGlJJamsN1wHI1j5Q+pCmBiUSyI4xPmaoLvkvvY53AdXWqozC9h5RkH471yUuNCHJHOIDvEobzovCR5o31vnRDwP9WQzcT1zzIOz+bGNXtU+eMzDRfvJhES1Hz/C6VW8cx+Bdv/JWByDxNL7is8C5DBZFgXguqh0u7T18LdiWbPOZwExzEwBlgKPI2M38/Ymh8uuOJfBvhCeE3zBqC4Lwl5FfKXpxaPbOo+o5tVxDF1eo82O8YkfB4ysSVWDNOs5/Sh7D1IY+N3C9G5IE1K37UWfee3Aiq3PVupfL14/sK9+vL0W8LTuKNSZlTMou+vk=
+  matrix:
+  - OCAML=4.07.1
+  - OCAML=4.08.0
+script:
+- echo "yes" | sudo add-apt-repository ppa:avsm/ppa
+- sudo apt-get update -qq
+- sudo apt-get install -qq opam
+- export OPAMYES=1
+- opam init --auto-setup --compiler=$OCAML
+- eval `opam config env`
+- opam pin add --yes --no-action $DEPNAME $DEPREPO
+- opam upgrade --yes --all
+- opam pin add --yes --no-action $PACKAGE .
+- opam install --yes --deps-only $PACKAGE
+- opam install --yes --verbose --build-doc --build-test --keep-build-dir $PACKAGE
+- bash -ex .travis.docgen.sh

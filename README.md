@@ -2,7 +2,8 @@
 A clean slate implementation of [NetKAT](http://www.cs.cornell.edu/~jnfoster/papers/frenetic-netkat.pdf).
 
 ## Documentation
-You can generate documentation from the source code. You need to have OCaml's packet manager `opam` and the packages `dune` and `odoc`installed:
+The API documentation is available [online](275f7702a23902a3a47485cb44a500ae4a2c6785).  
+You can also generate it locally from scratch. You need to have OCaml's packet manager `opam` and the packages `dune` and `odoc` installed:
 ```
 opam install dune odoc
 ```

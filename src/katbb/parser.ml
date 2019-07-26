@@ -49,3 +49,10 @@ let%expect_test "operator precedence" =
        (Seq (Action ((var x) (value true))) (Action ((var y) (value true))))
        (Star (Action ((var z) (value true)))))))
   |}]
+
+let%expect_test "illegal" =
+  Printexc.record_backtrace false;
+  parse_string "this!; is illegal!; isntit?"
+  |> Printf.printf !"%{sexp:Ast.exp}";
+  [%expect.unreachable]
+[@@expect.uncaught_exn {| ("Parsing.Make(Parser).ParseError(_, _)") |}]
