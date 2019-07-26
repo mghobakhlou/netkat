@@ -18,6 +18,7 @@
     (base (>= v0.12.0))
     (core (>= v0.12.0))
     (stdio (>= v0.12.0))
+    (odoc :with-doc)
     (open (>= 0))
     (idds (<> 0))
     (ppx_deriving (>= 4.3))
