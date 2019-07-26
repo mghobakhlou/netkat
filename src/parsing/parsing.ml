@@ -1,17 +1,3 @@
-(* let () = 
-  Location.error_reporter := Location.(fun fmt err ->
-    default_error_reporter fmt err;
-    begin match (!input_lexbuf) with
-    | Some lexbuf ->
-      Format.pp_force_newline fmt ();
-      show_code_at_location fmt lexbuf err.loc
-    | _ -> 
-      ()
-    end
-  )
-;;
- *)
- 
 let reraise exn =
   Printexc.(raise_with_backtrace exn (get_raw_backtrace ()))
 
@@ -72,7 +58,9 @@ module Make (Parser : PARSER) = struct
     curr_token := Some token;
     token
 
-  let parse lexbuf =
+  let parse ?(file="") lexbuf =
+    Location.init lexbuf file;
+    Location.input_name := file;
     Location.input_lexbuf := Some lexbuf;
     try 
       Parser.parse next_token lexbuf
@@ -101,10 +89,7 @@ module Make (Parser : PARSER) = struct
 
   let parse_file file =
     Stdio.In_channel.with_file file ~f:(fun chan ->
-      let lexbuf = Lexing.from_channel chan in
-      Location.init lexbuf file;
-      Location.input_name := file;
-      parse lexbuf
+      parse ~file (Lexing.from_channel chan)
     )
 
 end
