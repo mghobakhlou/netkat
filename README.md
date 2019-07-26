@@ -1,4 +1,4 @@
-# NetKAT
+# NetKAT [![Build Status](https://travis-ci.org/netkat-lang/netkat.svg?branch=master)](https://travis-ci.org/netkat-lang/netkat)
 A clean slate implementation of [NetKAT](http://www.cs.cornell.edu/~jnfoster/papers/frenetic-netkat.pdf).
 
 ## Documentation
