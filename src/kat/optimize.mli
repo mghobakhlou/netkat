@@ -28,6 +28,13 @@ val star : ('act, 'test) exp -> ('act, 'test) exp
 val ite : 'test bexp -> ('act, 'test) exp -> ('act, 'test) exp -> ('act, 'test) exp
 
 
+(** {2 N-ary constructors} *)
+
+val big_disj : 'test bexp list -> 'test bexp
+val big_conj : 'test bexp list -> 'test bexp
+val big_union : ('act, 'test) exp list -> ('act, 'test) exp
+val big_seq : ('act, 'test) exp list -> ('act, 'test) exp
+
 
 (** {1 Algebraic optimization}  *)
 
