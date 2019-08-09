@@ -20,6 +20,7 @@
     (stdio (>= v0.12.0))
     (odoc :with-doc)
     (open (>= 0))
+    (nice_parser (<> 0))
     (idds (<> 0))
     (ppx_deriving (>= 4.3))
     (ppx_inline_test (and :with-test (>= v0.12.0)))

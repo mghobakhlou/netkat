@@ -9,7 +9,7 @@
     base
     idds
     netkat.kat
-    netkat.parsing
+    nice_parser
   )
   (preprocess (pps
     ppx_jane

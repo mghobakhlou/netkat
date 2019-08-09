@@ -1,4 +1,4 @@
-include Parsing.Make(struct
+include Nice_parser.Make(struct
   type result = Ast.exp
   type token = Menhir_parser.token
   exception ParseError = Menhir_parser.Error
@@ -55,4 +55,4 @@ let%expect_test "illegal" =
   parse_string "this!; is illegal!; isntit?"
   |> Printf.printf !"%{sexp:Ast.exp}";
   [%expect.unreachable]
-[@@expect.uncaught_exn {| ("Parsing.Make(Parser).ParseError(_, _)") |}]
+[@@expect.uncaught_exn {| ("Nice_parser.Make(P).ParseError(_, _)") |}]
