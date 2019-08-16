@@ -24,5 +24,7 @@
     (ppx_deriving (>= 4.3))
     (ppx_inline_test (and :with-test (>= v0.12.0)))
     (ppx_jane (>= v0.12.0))
+    (printbox (>= 0.2))
+    (tyxml (>= 4.3.0))
   )
 )
