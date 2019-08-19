@@ -14,7 +14,6 @@ type ('k, 'b) kat = {
   star : 'k -> 'k;
 }
 
-
 let map_bexp
   ~(ba : 'b ba)
   ~(map_test : 'test -> 'b)

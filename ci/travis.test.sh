@@ -12,6 +12,6 @@ for PIN in $PINS; do
   IFS='@' read PIN_NAME PIN_REPO <<< "${PIN}"
   opam pin add --yes --no-action $PIN_NAME $PIN_REPO
 done
-opam pin add --yes --no-action $PACKAGE .
+opam pin add --yes --no-action --kind path $PACKAGE .
 opam install --yes --deps-only $PACKAGE
 opam install --yes --verbose --build-doc --build-test --keep-build-dir $PACKAGE
