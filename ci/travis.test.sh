@@ -6,7 +6,15 @@ if ! opam switch $OCAML; then
 fi
 eval $(opam env)
 opam pin remove --yes $PACKAGE
-opam update
+
+# if the opam repo gets corrupted for some reason, simply reinstall opam
+if ! opam update; then
+  rm -rf ~/.opam
+  opam init --yes --bare
+  opam switch create $OCAML
+  eval $(opam env)
+fi
+
 opam upgrade --yes --all
 for PIN in $PINS; do
   IFS='@' read PIN_NAME PIN_REPO <<< "${PIN}"
