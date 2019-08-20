@@ -99,35 +99,24 @@ let rec to_expr (tbl:table) ~interp_test ~interp_act =
       (to_expr t ~interp_test ~interp_act)
   | [] -> Kat.Ast.Assert (Kat.Ast.False)
 
-(** [to_str_lst p s] is "x1[s]b1;x2[s]b2];...;xn[s]bn" if 
+(** [to_str_lst p s var_name] is "(var_name x1)[s]b1;...;(var_name xn)[s]bn" if 
     [p]=\[(x1,b1);...;(xn,bn)\] *)
-let to_str_lst p s = String.drop_suffix
-  (List.fold_right ~f:(fun (v, b) str ->
-      let str1 = Caml.Format.sprintf "x%d" (Var.index v) in
-      let str2 = Caml.Format.sprintf (if b then ("1;%s") else "0;%s") str in
+let to_str_lst p s var_name = String.drop_suffix
+  (List.fold_right p ~init:"" ~f:(fun (v, b) str ->
+      let str1 = Caml.Format.sprintf "%s" (var_name v) in
+      let str2 = Caml.Format.sprintf (if b then "1;%s" else "0;%s") str in
       str1 ^ s ^ str2
     )
-    ~init:""
-    p
   )
   1
 
 (** [to_str_act act] is "s1;s2;...;sn" where [act]=\{a1,...,an\} and
-    [si] is [to_str_lst ai "←"] *)
-let to_str_act =
-  Set.fold
-  ~f:(fun str e -> Caml.Format.sprintf "[%s];%s" (to_str_lst e "←") str)
-  ~init:""
+    [si] is [to_str_lst ai "←" var_name] *)
+let to_str_act var_name =
+  Set.fold ~init:"" ~f:(fun str e -> 
+    Caml.Format.sprintf "[%s];%s" (to_str_lst e "←" var_name) str
+  )
   
-let to_string (tbl:table) =
-  let rec to_string = function
-    | (p, a)::t -> Caml.Format.sprintf "%s | {%s} \n%s" 
-      (to_str_lst p "=")
-      (to_str_act a)
-      (to_string t)
-    | [] -> ""
-  in
-  String.drop_suffix (to_string tbl) 2
 
 (*===========================================================================*)
 (* Helper functions for formatting HTML code                                 *)
@@ -169,24 +158,24 @@ let to_string_doc b =
     footer_str
 (*===========================================================================*)
 
+
 (** [render_box tbl] is the [PrintBox.t] object representing [tbl] *)
-let render_box tbl =
-  let str = to_string tbl in
-  let str_lst = String.split str ~on:'\n' in
-  let matrix = Array.make_matrix ~dimy:2 ~dimx:(List.length str_lst) "" in
-  let _ = List.iteri str_lst ~f:(fun i row -> 
-    let h1, h2 = match String.split row ~on:'|' with
-                | h1::h2::_ -> h1, h2
-                | _ -> failwith "Impossible"
-    in
-    matrix.(i).(0) <- (String.drop_suffix h1 1);
-    matrix.(i).(1) <- (String.drop_prefix h2 1)
+let render_box var_name tbl =
+  let matrix = Array.make_matrix ~dimy:2 ~dimx:(1+(List.length tbl)) "" in
+  let _ = matrix.(0).(0) <- "Pattern"; matrix.(0).(1) <- "Actions" in
+  let _ = List.iteri tbl ~f:(fun i (p,a) ->
+    matrix.(i+1).(0) <- (to_str_lst p "=" var_name);
+    matrix.(i+1).(1) <- (to_str_act var_name a)
   )
   in
   PrintBox.grid_text matrix
 
-let render tbl =
-  let box = render_box tbl in
+let to_string ?(var_name=Var.to_string) tbl =
+  render_box var_name tbl
+  |> PrintBox_text.to_string
+
+let render ?(var_name=Var.to_string) tbl =
+  let box = render_box var_name tbl in
   let output_file =
     Caml.Filename.(temp_file ("Forwarding Table_") (".html"))
     |> String.tr ~target:' ' ~replacement:'-'

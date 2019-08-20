@@ -30,8 +30,9 @@ val eval : table -> (Var.t -> bool) -> bool
 
 (** {2 Generic operations on Forwarding Tables} *)
 
-(** [to_string tbl] converts [tbl] to a string *)
-val to_string : table -> string
+(** [to_string ?var_name tbl] converts [tbl] to a string using [var_name] to map
+    variables to string. [var_name] defaults to [Var.to_string] *)
+val to_string : ?var_name:(Var.t -> string) -> table -> string
 
 (** [to_expr tbl ~interp_test ~interp_act] is the KAT expression representing 
     [tbl] where [interp_act] ([interp_test]) specifies how to map actions 
@@ -39,5 +40,6 @@ val to_string : table -> string
 val to_expr : table -> interp_test:((Var.t * bool) list -> 'test Kat.Ast.bexp)
   -> interp_act:((Var.t * bool) list -> ('act, 'test) Kat.Ast.exp) -> ('act, 'test) Kat.Ast.exp
 
-(** [render tbl] renders [tbl] in HTML and opens the file *)
-val render : table -> unit
+(** [render tbl] renders [tbl] in HTML and opens the file using [var_name] to 
+    map variables to string. [var_name] defaults to [Var.to_string] *)
+val render : ?var_name:(Var.t -> string) -> table -> unit
