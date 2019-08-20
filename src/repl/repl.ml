@@ -95,7 +95,6 @@ module Parser = struct
     eof >> 
     return (Show Table_Text)
 
-
   (* Parser for the idd_pdf command *)
   let idd_pdf : (command, bytes list) MParser.t =
     Tokens.symbol "idd_pdf" >>
