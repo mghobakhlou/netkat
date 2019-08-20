@@ -12,6 +12,7 @@
   (name netkat)
   (synopsis "A clean slate implementation of NetKAT")
   (depends
+    (async (>= 0.12.0))
     (ocaml (>= 4.07.0))
     (dune (and :build (>= 1.10)))
     (menhir (and :build (>= 20190626)))
@@ -27,5 +28,6 @@
     (ppx_jane (>= v0.12.0))
     (printbox (>= 0.2))
     (tyxml (>= 4.3.0))
+    (mparser (>= 1.2.3))
   )
 )

@@ -1,0 +1,15 @@
+(library
+  (name repl)
+  (public_name netkat.repl)
+  (wrapped true)
+  (libraries
+      async 
+      core
+      netkat.katbb_lib
+      idds
+      mparser
+      mparser.re
+      tables
+    )
+  (preprocess (pps ppx_jane))
+ )

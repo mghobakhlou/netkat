@@ -124,6 +124,12 @@ end
 (* BASIC SPECIFICATION OF COMMANDS                                           *)
 (*===========================================================================*)
 
+
+let run cmd =
+  ignore (cmd ());
+  never_returns (Async.Scheduler.go ())
+
+
 let idd : Command.t =
   Command.basic_spec
     ~summary:"Converts program to IDD and renders it."
@@ -136,10 +142,17 @@ let equiv : Command.t =
     Equiv.spec
     Equiv.run
 
+let repl : Command.t =
+  Command.basic_spec
+    ~summary:"Invokes the NetKAT REPL."
+    Command.Spec.empty
+    (fun () -> run (Repl.main))
+
+
 let main : Command.t =
   Command.group
     ~summary:"Analyzes KAT+B! program."
-    [("idd", idd); ("equiv", equiv)]
+    [("idd", idd); ("equiv", equiv); ("repl", repl)]
 
 let () =
   Command.run ~version: "0.1" ~build_info: "N/A" main
