@@ -25,11 +25,13 @@ type showable =
   | Help
 
 
-
 type command =
   (* usage: update <policy>
    * Compiles the specified policy *)
   | Update of (policy * string)
+  (* usage: <p1> = <p2>
+   * Tests whether p1 equals p2 *)
+  | Equiv of ((policy * string) * (policy * string))
   (* usage: load <filename>
    * Loads the specified file as a local policy and compiles it updating
      the controller with the new flow table. *)
@@ -59,9 +61,9 @@ module Parser = struct
   let parse_policy ?(name = "") (pol_str : string) : (policy, string) Result.t =
     Ok (Katbb_lib.Parser.parse_string pol_str)
 
-  (* Parser for netkat policies *)
-  let policy' : ((policy * string), bytes list) MParser.t =
-    many_until any_char eof >>= fun pol_chars ->
+  (* Consumes input until [till] is reached then compiles input into policy *)
+  let policy_till till : ((policy * string), bytes list) MParser.t =
+    many_until any_char till >>= fun pol_chars ->
     let pol_str = String.of_char_list pol_chars in
     match parse_policy pol_str with
     | Ok pol -> return (pol, pol_str)
@@ -70,9 +72,14 @@ module Parser = struct
   (* Parser for the Update command *)
   let update : (command, bytes list) MParser.t =
     Tokens.symbol "update" >>
-    policy' >>=
+    (policy_till eof) >>=
     (fun pol -> return (Update pol))
   
+  (* Parser for the Equiv command *)
+  let equiv : (command, bytes list) MParser.t =
+    pipe2 (policy_till (Tokens.symbol "=")) (policy_till eof) (fun p1 p2 -> Equiv (p1, p2))
+
+
   (* Parser for the load command *)
   let load : (command, bytes list) MParser.t =
     Tokens.symbol "load" >>
@@ -94,7 +101,6 @@ module Parser = struct
     Tokens.symbol "table_text" >>
     eof >> 
     return (Show Table_Text)
-
 
   (* Parser for the idd_pdf command *)
   let idd_pdf : (command, bytes list) MParser.t =
@@ -132,7 +138,8 @@ module Parser = struct
     idd_text;
     help;
     exit;
-    quit
+    quit;
+    equiv;
   ]
 
 end
@@ -149,36 +156,36 @@ let map_var_tbl tbl =
   |> List.map ~f:(fun (x,y) -> y,x)
   |> Hashtbl.of_alist_exn (module Int)
 
-let current_idd () =
-  let f (p, _) =
-    let mgr = Idd.manager () in
-    let tbl: int Hashtbl.M(String).t = Hashtbl.create (module String) in
-    let next = ref (-1) in
-    let map_var var =
-      Hashtbl.find_or_add tbl var ~default:(fun () ->
-        incr next;
-        !next
-      )
-    in
-    (Katbb_lib.Idd_compiler.compile_exp ~mgr ~map_var p, tbl)
+let get_idd ?(p=(fst !policy)) ?(mgr=Idd.manager ()) () =
+  let tbl: int Hashtbl.M(String).t = Hashtbl.create (module String) in
+  let next = ref (-1) in
+  let map_var var =
+    Hashtbl.find_or_add tbl var ~default:(fun () ->
+      incr next;
+      !next
+    )
   in
-  f !policy
+  (Katbb_lib.Idd_compiler.compile_exp ~mgr ~map_var p, tbl, mgr)
+
+
+let get_var_name tbl var =
+    Format.sprintf "%s%s"
+      (Hashtbl.find_exn tbl (Var.index var))
+      (if Var.is_inp var then "?" else "!")
 
 let show_idd_pdf () =
-  let idd, tbl = current_idd () in
+  let idd, tbl, _ = get_idd () in
   let tbl' = map_var_tbl tbl in
-  Dd.render (idd :> Dd.t) ~var_name:(fun var ->
-    Format.sprintf "%s%s"
-      (Hashtbl.find_exn tbl' (Var.index var))
-      (if Var.is_inp var then "?" else "!")
-  )
+  Dd.render (idd :> Dd.t) ~var_name:(get_var_name tbl')
 
 let show_idd_text () =
-  let idd, _ = current_idd () in
-  printf "IDD: \n%s\n%!" (Dd.to_string (idd :> Dd.t))
+  let idd, tbl, _ = get_idd () in
+  let tbl' = map_var_tbl tbl in
+  printf "IDD: \n%s\n%!"
+    (Dd.to_string ~var_name:(get_var_name tbl') (idd :> Dd.t))
 
 let show_table_html () =
-  let idd, tbl = current_idd () in
+  let idd, tbl, _ = get_idd () in
   let tbl' = map_var_tbl tbl in
   Tables.to_table idd 
   |> Tables.render ~var_name:(fun var ->
@@ -186,7 +193,7 @@ let show_table_html () =
   )
 
 let show_table_text () =
-  let idd, tbl = current_idd () in
+  let idd, tbl, _ = get_idd () in
   let tbl' = map_var_tbl tbl in
   Tables.to_table idd
   |> Tables.to_string ~var_name:(fun var ->
@@ -204,6 +211,8 @@ let help =
   "";
   "commands:";
   "  policy              - Displays the policy that is currently active.";
+  "";
+  "  <p1> = <p2>         - Tests whether policies p1 and p2 are equivalent";
   "";
   "  update <policy>     - Compiles the specified policy.";
   "";
@@ -240,6 +249,12 @@ let load_file filename =
   with
   | Sys_error msg -> printf "Load failed: %s\n%!" msg
 
+let equiv (p1, s1) (p2, s2) = 
+  let idd1, _, mgr = get_idd ~p:p1 () in
+  let idd2, _, _ = get_idd ~p:p2 ~mgr () in
+  let b = Idds.Idd.equal idd1 idd2 in
+  printf "Expression 1: %s \nExpression 2: %s\nEquivalent: %b\n%!" s1 s2 b
+
 
 let rec repl () = 
   printf "netkat> %!";
@@ -259,7 +274,9 @@ let rec repl () =
       | Some (Show IDD_PDF) -> show_idd_pdf ()
       | Some (Show IDD_Text) -> show_idd_text ()
 		  | Some (Update (pol, pol_str)) ->
-		     policy := (pol, pol_str)
+          policy := (pol, pol_str)
+      | Some (Equiv ((pol1, pol_str1), (pol2, pol_str2))) -> 
+          equiv (pol1, pol_str1) (pol2, pol_str2)
       | Some (Load filename) -> load_file filename
 		  | None -> ()
     with exn -> Location.report_exception Format.std_formatter exn
@@ -267,7 +284,7 @@ let rec repl () =
 
 
 let main () : unit =
-  printf "Netkat Shell\n";
+  printf "Welcome to the Netkat REPL!\n";
   printf "Type `help` for a list of commands\n";
   let _ = repl () in
   ()
