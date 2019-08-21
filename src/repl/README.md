@@ -11,6 +11,6 @@ dune build
 ```
 and start the REPL with
 ```
-dune exec -- katbb repl.
+dune exec -- katbb repl
 ```
 To see the available commands type `help` in the REPL.
