@@ -17,14 +17,14 @@ end
 
 type row = Pattern.t * Set.M(Action).t
 
-type table = row list
+type t = row list
 
-type t = (Pattern.t, Set.M(Action).t) Hashtbl.t
+type tbl = (Pattern.t, Set.M(Action).t) Hashtbl.t
 
 
 (** [intersect lst tbl] returns a forwarding table computed from all possible 
     intersections of rows in [lst] *)
-let rec intersect (lst:table) (tbl:t) =
+let rec intersect (lst:t) (tbl:tbl) =
   let rec build_intersections to_be_intersected rules lst =
     match lst with
     | [] -> 
@@ -76,7 +76,7 @@ let to_table (idd:Idd.t) =
   intersect (Hashtbl.to_alist tbl) tbl
 
 
-let eval (tbl:table) (env:(Var.t -> bool)) : bool =
+let eval (tbl:t) (env:(Var.t -> bool)) : bool =
   let check_lst lst = List.for_all lst ~f:(fun (v, b) -> Bool.equal b (env v)) in
   let rec eval = function
     | (p, a)::t -> if check_lst p then (Set.exists a ~f:check_lst)
@@ -85,7 +85,7 @@ let eval (tbl:table) (env:(Var.t -> bool)) : bool =
   in
   eval tbl
 
-let rec to_expr (tbl:table) ~interp_test ~interp_act = 
+let rec to_expr (tbl:t) ~interp_test ~interp_act = 
   match tbl with
   | (p,a)::t -> 
     Kat.Optimize.union
