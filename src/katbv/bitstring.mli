@@ -2,44 +2,49 @@ open Base
 
 (** {2 Type} *)
 
-(* the type of a bitstring. AF: the table [H] represents a bitvector [v] where
-   [v_i]=1 iff [(i, ())] is in [H]. Note that bitstrings are interpreted left 
+(* the type of a bit string. AF: the table [H] represents a bitvector [v] where
+   [v_i]=1 iff [(i, ())] is in [H]. Note that bit strings are interpreted left 
    to right as highest bit to lowest bit. So the string 110 is the binary
    representation of 6 and (100)_0 = 0 whereas (100)_2 = 1 *)
-type t [@@deriving sexp]
+type t = (int, unit) Hashtbl.t [@@deriving sexp]
 include Comparator.S with type t := t
 
 
 (** {2 Constructors} *)
 
+(* the zero bit string *)
 val zero : t
 
-(* [of_bool_list lst bv] is the bit string representation of [lst] *)
+(* [of_bool_list lst bv] is the bit string [v] where [v_i]=1 iff [lst_i]=true *)
 val of_bool_list : bool list -> t
 
-(* [of_int_list lst bv] the bit string [v] where [v_i]=1 iff i is in [lst] *)
+(* [of_int_list lst bv] the bit string [v] where [v_i]=1 iff [i] is in [lst] *)
 val of_int_list: int list -> t
 
 (** {2 Basic Operations} *)
 
+(* [max v] is [Some i] where [i] is the maximum of \{j:[v_j]=1\} *)
 val max : t -> int option
 
+(* [min v] is [Some i] where [i] is the minimum of \{j:[v_j]=1\} *)
 val min : t -> int option
 
 (* [v**v'] is bitwise multiplication of [v] and [v'] *)
 val ( ** ) : t -> t -> t
 
-(* [v++v'] is bitwise addition *)
+(* [v++v'] is bitwise addition of [v] and [v'] *)
 val ( ++ ) : t -> t -> t
 
-(* [v -- v'] is subtraction *)
+(* [v -- v'] is [v''] where [v''_i]=0 if [v'_i]=1 and otherwise [v''_i]=[v_i] *)
 val ( -- ) : t -> t -> t
 
+(* [xor v v'] is the bitwise xor of [v] and [v'] *)
 val xor : t -> t -> t
 
-(* tests whether v=0 *)
+(* [is_zero v] is true iff [v]=0 *)
 val is_zero : t -> bool
 
+(* [equal v v'] is true iff [v]=[v'] *)
 val equal : t -> t -> bool
 
 (* [nth v i] is true iff [v_i]=1  *)

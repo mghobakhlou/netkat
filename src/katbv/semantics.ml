@@ -5,7 +5,6 @@ open Ast
 module Env = struct
   module T = struct
     type t = Bitstring.t Hashtbl.M(String).t [@@deriving sexp]
-    (* need to improve compare *)
     let compare t1 t2 =
       if Hashtbl.equal t1 t2 Bitstring.equal then 0
       else 
@@ -26,7 +25,7 @@ let get_env env v =
 let eval_test (env:Env.t) = function
   | Interval (v, a, b) -> 
     let test_bound x1 x2 = 
-      match Bitstring.(min (xor x1 x2)) with
+      match Bitstring.(max (xor x1 x2)) with
       | None -> true
       | Some i -> Bitstring.nth x1 i
     in
@@ -36,7 +35,6 @@ let eval_test (env:Env.t) = function
     let env' = get_env env v in
     Bitstring.(is_zero (env' ** z) && equal (env' ++ n) n)    
     
-
 let rec eval_pred (env:Env.t) (b:bexp) : bool =
   match b with
   | True -> true
@@ -45,7 +43,6 @@ let rec eval_pred (env:Env.t) (b:bexp) : bool =
   | Disj (b1, b2) -> (eval_pred env b1) || (eval_pred env b2)
   | Conj (b1, b2) -> (eval_pred env b1) && (eval_pred env b2)
   | Neg b' -> not (eval_pred env b')
-
 
 let eval_act (env:Env.t) ((v, z, n):act) = 
   let v' = get_env env v in

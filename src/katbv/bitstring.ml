@@ -91,11 +91,10 @@ let build_clause v a m lst init_bool =
         Some (Kat.Ast.Test (test v i (nth a i)))
       ) in
       let formula' = Kat.Optimize.disj formula (Kat.Optimize.big_conj clause) in
-      Hashtbl.remove a h;
       build_clause a t formula'
     | [] -> formula
   in
-  let init_clause = build_list [] 0 m ~f:(fun i ->
+  let init_clause = build_list [] 0 (m+1) ~f:(fun i ->
     Some (Kat.Ast.Test (test v i (nth a i)))
   ) in
   build_clause a lst (Kat.Optimize.big_conj init_clause)
@@ -131,7 +130,6 @@ let lower_bound (v:string) (a:t) : Katbb_lib.Ast.bexp =
       if Hashtbl.mem a i then None else Some i
     ) in
     build_clause v a m lst true
-
 
 let upper_bound (v:string) (b:t) : Katbb_lib.Ast.bexp =
   let lst = Hashtbl.keys b in

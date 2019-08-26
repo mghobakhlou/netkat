@@ -33,8 +33,7 @@ let map_test = function
     (build_test v z n)
 
 let map_act (v, z, n) = 
-  let h (bl:bool) (i:int) : Katbb_lib.Ast.exp = 
-    Kat.Ast.Action (test v i bl) in
+  let h (bl:bool) (i:int) : Katbb_lib.Ast.exp = Kat.Ast.Action (test v i bl) in
   Bitstring.build_term_list v z n h
   |> Kat.Optimize.big_union
 
