@@ -2,7 +2,7 @@ open Core
 open Idds
 open Async
 
-type policy = Katbb_lib.Ast.exp
+type policy = Katbv_lib.Ast.exp
 
 type showable =
   (* usage: policy
@@ -59,7 +59,7 @@ module Parser = struct
 
   (* Use the netkat parser to parse policies *)
   let parse_policy ?(name = "") (pol_str : string) : (policy, string) Result.t =
-    Ok (Katbb_lib.Parser.parse_string pol_str)
+    Ok (Katbv_lib.Parser.parse_string pol_str)
 
   (* Consumes input until [till] is reached then compiles input into policy *)
   let policy_till till : ((policy * string), bytes list) MParser.t =
@@ -165,7 +165,7 @@ let get_idd ?(p=(fst !policy)) ?(mgr=Idd.manager ()) () =
       !next
     )
   in
-  (Katbb_lib.Idd_compiler.compile_exp ~mgr ~map_var p, tbl, mgr)
+  (Katbv_lib.Compiler.to_idd ~mgr ~map_var p, tbl, mgr)
 
 
 let get_var_name tbl var =
@@ -242,7 +242,7 @@ let load_file filename =
     let open In_channel in
     let chan = create filename in
     let policy_string = input_all chan |> String.strip in
-    let pol = Katbb_lib.Parser.parse_string policy_string in
+    let pol = Katbv_lib.Parser.parse_string policy_string in
     close chan;
     policy := (pol, policy_string);
     show_policy ()
@@ -284,7 +284,7 @@ let rec repl () =
 
 
 let main () : unit =
-  printf "Welcome to the Netkat REPL!\n";
+  printf "Welcome to the KAT+BV REPL!\n";
   printf "Type `help` for a list of commands\n";
   let _ = repl () in
   ()

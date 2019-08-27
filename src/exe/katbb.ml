@@ -173,9 +173,9 @@ let equiv : Command.t =
 
 let repl : Command.t =
   Command.basic_spec
-    ~summary:"Invokes the NetKAT REPL."
+    ~summary:"Invokes the KAT+B! REPL."
     Command.Spec.empty
-    (fun () -> run (Repl.main))
+    (fun () -> run (Repl.Repl_katbb.main))
 
 let table : Command.t =
   Command.basic_spec

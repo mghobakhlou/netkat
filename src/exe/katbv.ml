@@ -84,9 +84,50 @@ module Idd = struct
 end
 
 
+module Equiv = struct
+  let spec = Command.Spec.(
+      empty
+      +> anon ("file1" %: string)
+      +> anon ("file2" %: string)
+      +> Flag.stdin
+    )
+
+  let run file_or_exp1 file_or_exp2 stdin () = begin
+    Parser.pp_exceptions ();
+    let exp1 =
+      parse_exp (if stdin then `String file_or_exp1 else `File file_or_exp1)
+    in
+    let exp2 =
+      parse_exp (if stdin then `String file_or_exp2 else `File file_or_exp2)
+    in
+    printf "parsing succeeded!\n\n";
+    printf !"-> %{sexp:Ast.exp}\n\n" exp1;
+    printf !"-> %{sexp:Ast.exp}\n\n" exp2;
+
+    let (time, equiv) = time (fun () ->
+        let idd1,_,mgr = compile_exp exp1 in
+        let idd2,_,_ = compile_exp ~mgr exp2 in
+        let id1, id2 = Idds.Dd.(id (idd1 :> t), id (idd2 :> t)) in
+        printf "IDD ids: %d, %d\n" id1 id2;
+        Idds.Idd.equal idd1 idd2
+      )
+    in
+    printf "expressions equivalent: %b\n\n" equiv;
+    print_time time;
+  end
+
+end
+
+
 (*===========================================================================*)
 (* BASIC SPECIFICATION OF COMMANDS                                           *)
 (*===========================================================================*)
+
+
+let run cmd =
+  ignore (cmd ());
+  never_returns (Async.Scheduler.go ())
+
 
 let idd : Command.t =
   Command.basic_spec
@@ -94,10 +135,22 @@ let idd : Command.t =
     Idd.spec
     Idd.run
 
+let equiv : Command.t =
+  Command.basic_spec
+    ~summary:"Checks pair of programs for equivalence."
+    Equiv.spec
+    Equiv.run
+
+let repl : Command.t =
+  Command.basic_spec
+    ~summary:"Invokes the KAT+BV REPL."
+    Command.Spec.empty
+    (fun () -> run (Repl.Repl_katbv.main))
+
 let main : Command.t =
   Command.group
     ~summary:"Analyzes KAT+BV program."
-    [("idd", idd)]
+    [("idd", idd); ("equiv", equiv); ("repl", repl)]
 
 let () =
   Command.run ~version: "0.1" ~build_info: "N/A" main
