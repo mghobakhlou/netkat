@@ -3,7 +3,6 @@
 %token <string> VAR
 %token ASSIGN LEQ GEQ EQUALS TILDE
 %token PLUS SCOLON STAR
-%token <string> BITMASK 
 %token <string> MASK
 %token ONE ZERO
 %token IF THEN ELSE
@@ -66,7 +65,7 @@ bexpRest:
         snd (Bitstring.of_ternary mask)
       ))
     }
-  | bitmask1=BITMASK; LEQ; var=VAR; LEQ; bitmask2=BITMASK
+  | bitmask1=MASK; LEQ; var=VAR; LEQ; bitmask2=MASK
     {
       Kat.Optimize.test (Ast.Interval (
         var,
@@ -74,7 +73,7 @@ bexpRest:
         Bitstring.of_binary bitmask2
       ))
     }
-  | bitmask1=BITMASK; GEQ; var=VAR; GEQ; bitmask2=BITMASK
+  | bitmask1=MASK; GEQ; var=VAR; GEQ; bitmask2=MASK
     {
       Kat.Optimize.test (Ast.Interval (
         var,
@@ -82,7 +81,7 @@ bexpRest:
         Bitstring.of_binary bitmask1
       ))
     }
-  | var=VAR; LEQ; bitmask=BITMASK
+  | var=VAR; LEQ; bitmask=MASK
     {
       Kat.Optimize.test (Ast.Interval (
         var,
@@ -90,7 +89,7 @@ bexpRest:
         Bitstring.of_binary bitmask
       ))
     }
-  | bitmask=BITMASK; GEQ; var=VAR
+  | bitmask=MASK; GEQ; var=VAR
     {
       Kat.Optimize.test (Ast.Interval (
         var,

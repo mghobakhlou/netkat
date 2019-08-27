@@ -13,8 +13,7 @@ let whitespace = ' ' | '\t'
 let newline = "\r\n" | '\r' | '\n'
 let ident = ['A'-'Z' 'a'-'z'] ['A'-'Z' 'a'-'z' '0'-'9' '_']*
 
-let bitstring = ['0'-'1']+
-let ternarystring = ['0' '1' '?']+
+let mask_rgx = ['0' '1' '?']+
 
 rule next_token = parse
   | whitespace+
@@ -40,8 +39,7 @@ rule next_token = parse
   | "if" { IF }
   | "then" { THEN }
   | "else" { ELSE }
-  | bitstring as bitmask { BITMASK bitmask }
-  | ternarystring as mask { MASK mask }
+  | mask_rgx as mask { MASK mask }
   | ident as var { VAR var }
 
   (* EOF/illegal token *)
