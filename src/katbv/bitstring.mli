@@ -21,6 +21,13 @@ val of_bool_list : bool list -> t
 (* [of_int_list lst bv] the bit string [v] where [v_i]=1 iff [i] is in [lst] *)
 val of_int_list: int list -> t
 
+(* [of_binary s] is the bit string [v] where [v_i]=1 iff [s_i]="1" *)
+val of_binary : string -> t
+
+(* [of_ternary s] is the pair (z, n) where [z_i]=1 iff [s_i]="0" and 
+   [n_i]=1 iff [s_i]="1" *)
+val of_ternary : string -> t * t
+
 (** {2 Basic Operations} *)
 
 (* [max v] is [Some i] where [i] is the maximum of \{j:[v_j]=1\} *)

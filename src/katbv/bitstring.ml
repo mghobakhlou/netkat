@@ -45,6 +45,29 @@ let of_bool_list lst =
 let of_int_list lst = Hashtbl.group (module Int) ~get_key:(fun i -> i)
   ~get_data:(fun _ -> ()) ~combine:(fun _ _ -> ()) lst
 
+
+let of_binary s =
+  String.fold s ~init:[] ~f:(fun acc c ->
+    match Char.get_digit c with
+    | Some i -> i::acc
+    | None -> acc
+  )
+  |> List.foldi ~init:[] ~f:(fun i acc b ->
+    if b = 1 then i::acc else acc
+  )
+  |> of_int_list
+
+let of_ternary s =
+  let len = String.length s in
+  let z,n = String.foldi s ~init:([],[]) ~f:(fun i (z',n') c ->
+    match Char.get_digit c with
+    | Some 0 -> ((len-i-1)::z',n')
+    | Some 1 -> (z',(len-i-1)::n')
+    | _ -> (z',n')
+  )
+  in
+  (of_int_list z),(of_int_list n)
+
 let test v i bl = 
   Katbb_lib.Ast.{var = v ^ Int.to_string i; value = bl}
 

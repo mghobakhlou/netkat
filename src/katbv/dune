@@ -1,3 +1,6 @@
+(ocamllex (modules lexer))
+(menhir (modules menhir_parser))
+
 (library
   (name katbv_lib)
   (public_name netkat.katbv_lib)
