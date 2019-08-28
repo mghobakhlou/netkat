@@ -24,7 +24,7 @@ tested. For example `x=??1?` matches all bit vectors which have a `1` in the
 second bit position.
 - `[a]<=x<=[b]` tests that `x` is in the range `[a,b]` where `[a]` and `[b]` are
 binary numbers. One can also simply write `x<=[b]` which is parsed as `0<=x<=[b]`.
-- `p+q` `p;q` `~p` -- Boolean "Disjunction" "Conjunction" "negation" respectively
+- `p+q` `p;q` `~p` -- Boolean "disjunction" "conjunction" "negation" respectively
 
 The parser recognizes the following syntax for KAT+BV expressions
 - `[Boolean expression]`
