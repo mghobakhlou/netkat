@@ -31,8 +31,8 @@ The parser recognizes the following syntax for KAT+BV expressions
 - `x:=[mask]` where `[mask]` is a string of `{1,0,?}` indicating which bits to 
 update in `x`. For example `x:=0???` updates the fourth bit to be a 0.
 - `p+q` `p;q` `p*` -- union sequence Kleene star respectively
-- `IF [Boolean expression] THEN [expression] ELSE [expression]` -- 
-`IF b THEN e1 ELSE e2` is parsed as `b;e1+~b;e2`.
+- `if [Boolean expression] then [expression] else [expression]` -- 
+`if b then e1 else e2` is parsed as `b;e1+~b;e2`.
 
 
 ## Command line interface
