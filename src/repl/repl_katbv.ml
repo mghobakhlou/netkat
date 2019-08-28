@@ -3,6 +3,7 @@ open Idds
 open Async
 
 type policy = Katbv_lib.Ast.exp
+type env = Katbv_lib.Semantics.Env.t
 
 type showable =
   (* usage: policy
@@ -29,6 +30,7 @@ type command =
   (* usage: update <policy>
    * Compiles the specified policy *)
   | Update of (policy * string)
+  | Eval of (env * string)
   (* usage: <p1> = <p2>
    * Tests whether p1 equals p2 *)
   | Equiv of ((policy * string) * (policy * string))
@@ -61,23 +63,35 @@ module Parser = struct
   let parse_policy ?(name = "") (pol_str : string) : (policy, string) Result.t =
     Ok (Katbv_lib.Parser.parse_string pol_str)
 
-  (* Consumes input until [till] is reached then compiles input into policy *)
-  let policy_till till : ((policy * string), bytes list) MParser.t =
-    many_until any_char till >>= fun pol_chars ->
-    let pol_str = String.of_char_list pol_chars in
-    match parse_policy pol_str with
-    | Ok pol -> return (pol, pol_str)
+
+  let parse_env (env_str : string) : (env, string) Result.t =
+    let lst = 
+      List.map (String.split env_str ~on:';') ~f:(String.lsplit2_exn ~on:'=') in
+    Ok (Katbv_lib.Semantics.of_str_lst lst)
+
+  (* Consumes input until [till] is reached then compiles input with [f] *)
+  let f_till f till : (('a * string), bytes list) MParser.t =
+    many_until any_char till >>= fun str_chars ->
+    let str = String.of_char_list str_chars in
+    match f str with
+    | Ok exp -> return (exp, str)
     | Error msg -> fail msg
 
   (* Parser for the Update command *)
   let update : (command, bytes list) MParser.t =
     Tokens.symbol "update" >>
-    (policy_till eof) >>=
+    (f_till parse_policy eof) >>=
     (fun pol -> return (Update pol))
   
+  let eval : (command, bytes list) MParser.t =
+    Tokens.symbol "eval" >>
+    (f_till parse_env eof) >>=
+    (fun env -> return (Eval env))
+
   (* Parser for the Equiv command *)
   let equiv : (command, bytes list) MParser.t =
-    pipe2 (policy_till (Tokens.symbol "==")) (policy_till eof) (fun p1 p2 -> Equiv (p1, p2))
+    pipe2 ((f_till parse_policy) (Tokens.symbol "=="))
+          ((f_till parse_policy) eof) (fun p1 p2 -> Equiv (p1, p2))
 
 
   (* Parser for the load command *)
@@ -131,6 +145,7 @@ module Parser = struct
   let command : (command, bytes list) MParser.t = choice [
     update;
     load;
+    eval;
     policy;
     table_html;
     table_text;
@@ -212,7 +227,12 @@ let help =
   "commands:";
   "  policy              - Displays the policy that is currently active.";
   "";
-  "  <p1> == <p2>         - Tests whether policies p1 and p2 are equivalent";
+  "  eval <env>          - Evaluates the current policy on the given environment.";
+  "                        Environment must be of the form x1=[mask];x2=[mask];...;xn=[mask]";
+  "                        where xi is a header field appearing in the policy and";
+  "                        [mask] is a bit string.";
+  "";
+  "  <p1> == <p2>        - Tests whether policies p1 and p2 are equivalent";
   "";
   "  update <policy>     - Compiles the specified policy.";
   "";
@@ -249,6 +269,20 @@ let load_file filename =
   with
   | Sys_error msg -> printf "Load failed: %s\n%!" msg
 
+
+let eval (env, env_str) =
+  show_policy ();
+  printf "evaluated on %s yields:\n" env_str;
+  Katbv_lib.Semantics.eval ~env (fst !policy)
+  |> Katbv_lib.Semantics.to_str_lst
+  |> List.map ~f:(fun lst ->
+    printf "-----------------\n";
+    List.map lst ~f:(fun (a,b) ->
+      printf "%s=%s\n%!" a b
+    )
+  )
+  |> ignore
+
 let equiv (p1, s1) (p2, s2) = 
   let idd1, _, mgr = get_idd ~p:p1 () in
   let idd2, _, _ = get_idd ~p:p2 ~mgr () in
@@ -275,8 +309,10 @@ let rec repl () =
       | Some (Show IDD_Text) -> show_idd_text ()
 		  | Some (Update (pol, pol_str)) ->
           policy := (pol, pol_str)
-      | Some (Equiv ((pol1, pol_str1), (pol2, pol_str2))) -> 
-          equiv (pol1, pol_str1) (pol2, pol_str2)
+      | Some (Eval env) -> 
+          eval env
+      | Some (Equiv (p1, p2)) -> 
+          equiv p1 p2
       | Some (Load filename) -> load_file filename
 		  | None -> ()
     with exn -> Location.report_exception Format.std_formatter exn

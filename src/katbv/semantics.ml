@@ -17,6 +17,19 @@ end
 
 type env_set = Set.M(Env).t
 
+
+let of_str_lst lst =
+  List.map lst ~f:(fun (a,b) -> (a,Bitstring.of_binary b))
+  |> Hashtbl.of_alist_exn (module String)
+
+
+let to_str_lst env_st = 
+  Set.fold env_st ~init:[] ~f:(fun lst elm ->
+    Hashtbl.to_alist elm
+    |> List.map ~f:(fun (a,b) -> (a, Bitstring.to_string b))
+    |> (fun h -> h::lst)
+  )
+
 let get_env env v =
   match Hashtbl.find env v with
   | Some v -> v
@@ -47,7 +60,9 @@ let rec eval_pred (env:Env.t) (b:bexp) : bool =
 let eval_act (env:Env.t) ((v, z, n):act) = 
   let v' = get_env env v in
   let updated_v' = Bitstring.((v' -- z) ++ n) in
-  Hashtbl.update env v ~f:(fun _ -> updated_v')
+  let modified_env = Hashtbl.copy env in
+  Hashtbl.update modified_env v ~f:(fun _ -> updated_v');
+  Set.singleton (module Env) modified_env
 
 let rec eval ~env (exp:exp) =
   match exp with
@@ -56,7 +71,7 @@ let rec eval ~env (exp:exp) =
       Set.singleton (module Env) env
     else 
       Set.empty (module Env)
-  | Action act -> eval_act env act; Set.singleton (module Env) env
+  | Action act -> eval_act env act
   | Union (e1, e2) -> Set.union (eval ~env e1) (eval ~env e2)
   | Seq (e1, e2) -> Set.fold (eval ~env e1) ~init:(Set.empty (module Env))
     ~f:(fun set env' -> Set.union set (eval env' e2))

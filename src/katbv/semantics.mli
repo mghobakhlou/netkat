@@ -6,7 +6,13 @@ module Env : sig
   include Comparator.S with type t := t
 end
 
+(* [of_str_lst lst] is [env] where [x] maps to [Bistring.of_binary v] in [env] 
+   if [(x,v)] is in [lst] *)
+val of_str_lst : (string * string) list -> Env.t
+
 type env_set = Set.M(Env).t
+
+val to_str_lst : env_set -> (string * string) list list
 
 (* [eval ~env exp] is the set of mappings from field values to bit strings 
    produced by [exp] evaluated on [env]. Note that fields unspecified by [env]
