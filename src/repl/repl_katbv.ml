@@ -77,7 +77,7 @@ module Parser = struct
   
   (* Parser for the Equiv command *)
   let equiv : (command, bytes list) MParser.t =
-    pipe2 (policy_till (Tokens.symbol "=")) (policy_till eof) (fun p1 p2 -> Equiv (p1, p2))
+    pipe2 (policy_till (Tokens.symbol "==")) (policy_till eof) (fun p1 p2 -> Equiv (p1, p2))
 
 
   (* Parser for the load command *)
@@ -212,7 +212,7 @@ let help =
   "commands:";
   "  policy              - Displays the policy that is currently active.";
   "";
-  "  <p1> = <p2>         - Tests whether policies p1 and p2 are equivalent";
+  "  <p1> == <p2>         - Tests whether policies p1 and p2 are equivalent";
   "";
   "  update <policy>     - Compiles the specified policy.";
   "";
