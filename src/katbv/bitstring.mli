@@ -39,7 +39,7 @@ val min : t -> int option
 (** [v**v'] is bitwise multiplication of [v] and [v'] *)
 val ( ** ) : t -> t -> t
 
-(** [v++v'] is bitwise addition of [v] and [v'] *)
+(** [v++v'] is bitwise OR of [v] and [v'] *)
 val ( ++ ) : t -> t -> t
 
 (** [v -- v'] is [v''] where [v''_i]=0 if [v'_i]=1 and otherwise [v''_i]=[v_i] *)

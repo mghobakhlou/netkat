@@ -46,7 +46,7 @@ let eval_test (env:Env.t) = function
     (test_bound env' a) && (test_bound b env')
   | Test (v, z, n) -> 
     let env' = get_env env v in
-    Bitstring.(is_zero (env' ** z) && equal (env' ++ n) n)    
+    Bitstring.(is_zero (env' ** z) && equal (env' ++ n) env')    
     
 let rec eval_pred (env:Env.t) (b:bexp) : bool =
   match b with
