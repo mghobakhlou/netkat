@@ -9,8 +9,11 @@ Build the project with
 ```
 dune build
 ```
-and start the REPL with
+and start the KAT+B! REPL with
 ```
 dune exec -- katbb repl
 ```
+Alternatively replace `katbb` in the above command with `katbv` to invoke the 
+KAT+BV REPL.
+
 To see the available commands type `help` in the REPL.

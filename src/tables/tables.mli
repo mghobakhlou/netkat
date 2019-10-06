@@ -15,31 +15,31 @@ open Base
 (** {2 Type} *)
 
 (** The type of a forwarding table. *)
-type table
+type t
 
 (** {2 Constructor} *)
 
 (** [to_table idd] is the table [t] such that [eval t env] iff [Idd.eval idd env]
     for all [env] *)
-val to_table : Idd.t -> table
+val to_table : Idd.t -> t
 
 (** {2 Semantics} *)
 
 (** [eval tbl env] evaluates the forwarding table [tbl] in environment [env] *)
-val eval : table -> (Var.t -> bool) -> bool
+val eval : t -> (Var.t -> bool) -> bool
 
 (** {2 Generic operations on Forwarding Tables} *)
 
 (** [to_string ?var_name tbl] converts [tbl] to a string using [var_name] to map
     variables to string. [var_name] defaults to [Var.to_string] *)
-val to_string : ?var_name:(Var.t -> string) -> table -> string
+val to_string : ?var_name:(Var.t -> string) -> t -> string
 
 (** [to_expr tbl ~interp_test ~interp_act] is the KAT expression representing 
     [tbl] where [interp_act] ([interp_test]) specifies how to map actions 
     (patterns) in the forwarding table to (Boolean) expressions *)
-val to_expr : table -> interp_test:((Var.t * bool) list -> 'test Kat.Ast.bexp)
+val to_expr : t -> interp_test:((Var.t * bool) list -> 'test Kat.Ast.bexp)
   -> interp_act:((Var.t * bool) list -> ('act, 'test) Kat.Ast.exp) -> ('act, 'test) Kat.Ast.exp
 
 (** [render tbl] renders [tbl] in HTML and opens the file using [var_name] to 
     map variables to string. [var_name] defaults to [Var.to_string] *)
-val render : ?var_name:(Var.t -> string) -> table -> unit
+val render : ?var_name:(Var.t -> string) -> t -> unit

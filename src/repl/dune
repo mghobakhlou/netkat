@@ -6,6 +6,7 @@
       async 
       core
       netkat.katbb_lib
+      netkat.katbv_lib
       idds
       mparser
       mparser.re

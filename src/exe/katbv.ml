@@ -1,6 +1,6 @@
 open Core
 open Idds
-open Katbb_lib
+open Katbv_lib
 
 (*===========================================================================*)
 (* UTILITY FUNCTIONS                                                         *)
@@ -21,7 +21,7 @@ let compile_exp ?mgr (exp : Ast.exp) : Idd.t * int Hashtbl.M(String).t * Idd.man
       !next
     )
   in
-  let idd = Idd_compiler.compile_exp ~mgr ~map_var exp in
+  let idd = Compiler.to_idd ~mgr ~map_var exp in
   idd, tbl, mgr
 
 let time f =
@@ -119,37 +119,6 @@ module Equiv = struct
 end
 
 
-module Table = struct
-  let spec = Command.Spec.(
-      empty
-      +> anon ("file" %: string)
-      +> Flag.stdin
-    )
-  
-  let run file_or_str stdin () = begin
-    Parser.pp_exceptions ();
-    let exp =
-      parse_exp (if stdin then `String file_or_str else `File file_or_str)
-    in
-    printf "parsing succeeded!\n";
-    printf !"-> %{sexp:Ast.exp}\n" exp;
-
-    let (time, (idd, map_var, _)) = time (fun () -> compile_exp exp) in
-    print_time time;
-    let var_name_tbl =
-      Hashtbl.to_alist map_var
-      |> List.map ~f:(fun (x,y) -> y,x)
-      |> Hashtbl.of_alist_exn (module Int)
-    in
-    Tables.to_table idd 
-    |> Tables.render ~var_name:(fun var ->
-      Format.sprintf "%s" (Hashtbl.find_exn var_name_tbl (Var.index var))
-    );
-  end
-
-end
-
-
 (*===========================================================================*)
 (* BASIC SPECIFICATION OF COMMANDS                                           *)
 (*===========================================================================*)
@@ -158,6 +127,7 @@ end
 let run cmd =
   ignore (cmd ());
   never_returns (Async.Scheduler.go ())
+
 
 let idd : Command.t =
   Command.basic_spec
@@ -173,20 +143,14 @@ let equiv : Command.t =
 
 let repl : Command.t =
   Command.basic_spec
-    ~summary:"Invokes the KAT+B! REPL."
+    ~summary:"Invokes the KAT+BV REPL."
     Command.Spec.empty
-    (fun () -> run (Repl.Repl_katbb.main))
-
-let table : Command.t =
-  Command.basic_spec
-  ~summary:"Converts program to forwarding table and renders it."
-  Table.spec
-  Table.run
+    (fun () -> run (Repl.Repl_katbv.main))
 
 let main : Command.t =
   Command.group
-    ~summary:"Analyzes KAT+B! program."
-    [("idd", idd); ("equiv", equiv); ("repl", repl); ("table", table)]
+    ~summary:"Analyzes KAT+BV program."
+    [("idd", idd); ("equiv", equiv); ("repl", repl)]
 
 let () =
   Command.run ~version: "0.1" ~build_info: "N/A" main
