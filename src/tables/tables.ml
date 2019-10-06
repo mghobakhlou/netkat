@@ -21,23 +21,29 @@ type t = row list
 
 type tbl = (Pattern.t, Set.M(Action).t) Hashtbl.t
 
+let compare_vars v v' =
+  match Var.closer_to_root v v' with
+  | Left -> 1
+  | Equal -> 0
+  | Right -> -1
 
 (** [intersect lst tbl] returns a forwarding table computed from all possible 
     intersections of rows in [lst] *)
 let rec intersect (lst:t) (tbl:tbl) =
   let rec build_intersections to_be_intersected rules lst =
     match lst with
-    | [] -> 
+    | [] ->
         let intersection = List.concat to_be_intersected in
-        if List.contains_dup ~compare:(fun (v, b) (v', b') -> 
-            Bool.to_int (not (Var.equal v v') || (Bool.equal b b'))
-          ) intersection || (List.length to_be_intersected) = 0 then ()
+        (* want to check if two patterns contradict each other e.g. xi=0,xi=1 *)
+        if 0 = List.length to_be_intersected then ()
+        else if List.contains_dup ~compare:(fun (v,b) (v',b') ->
+          let c = compare_vars v v' in
+          if 0 = c then Bool.to_int (Bool.equal b b')
+          else c
+        ) intersection then () 
         else
-          let pattern = List.dedup_and_sort ~compare:(fun (v, _) (v', _) -> 
-            match Var.closer_to_root v v' with
-            | Left -> 1
-            | Equal -> 0
-            | Right -> -1
+          let pattern = List.dedup_and_sort ~compare:(fun (v,_) (v',_) ->
+            compare_vars v v'
           ) intersection in
           Hashtbl.update tbl pattern ~f:(fun r ->
             match r with
@@ -72,8 +78,10 @@ let to_table (idd:Idd.t) =
       (to_tables hi pattern ((var, true)::rule));
       (to_tables lo pattern ((var, false)::rule))
     in
-  to_tables (idd :> Dd.t) [] [];
-  intersect (Hashtbl.to_alist tbl) tbl
+    (* to_tables (idd :> Dd.t) [] [];
+    (Hashtbl.to_alist tbl) *)
+    to_tables (idd :> Dd.t) [] [];
+    intersect (Hashtbl.to_alist tbl) tbl
 
 
 let eval (tbl:t) (env:(Var.t -> bool)) : bool =

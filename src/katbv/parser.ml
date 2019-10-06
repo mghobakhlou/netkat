@@ -6,8 +6,6 @@ include Nice_parser.Make(struct
   include Lexer
 end)
 
-
-
 (* Expectation tests, see
    https://dune.readthedocs.io/en/stable/tests.html#inline-expectation-tests *)
 

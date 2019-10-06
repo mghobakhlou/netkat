@@ -22,7 +22,6 @@ let of_str_lst lst =
   List.map lst ~f:(fun (a,b) -> (a,Bitstring.of_binary b))
   |> Hashtbl.of_alist_exn (module String)
 
-
 let to_str_lst env_st = 
   Set.fold env_st ~init:[] ~f:(fun lst elm ->
     Hashtbl.to_alist elm

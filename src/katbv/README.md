@@ -56,3 +56,36 @@ Start the KAT+BV REPL with
 dune exec -- katbv repl
 ```
 To see the available commands type `help` in the REPL.
+
+The commands `table_html` and `idd_pdf` will open new programs outside the terminal.
+In particular `table_html` opens the default web browser and `idd_pdf` opens the
+default pdf viewer.
+
+### Format of tables
+A table in the REPL can be rendered with `table_text`. This will produce a table
+of the form
+
+```
+Table: 
+Pattern      |Actions
+-------------+-------------------------
+xi=0;yj=1;...|[yj←1;xi←1;...];[y0←1;...];
+-------------+-------------------------
+...
+```
+where `xi=0` matches any input such that the ith bit (read from the right) of
+field `x` is `0`. A given input matches a row in the table if it matches all conditions
+(which are separated by semicolons). After matching a row, the input has a set of
+actions applied to it. Each square bracket pair `[]` in an entry in the action
+column indicates one action: that which corresponds to updating the bits of the
+fields as specified. For example `yj←1` is the action resulting from updating 
+the jth bit of field `y` to 1. The action `[]` denotes the identity, i.e. no
+updates are performed and the input is returned. If an input does not match a row
+the input is dropped.
+
+
+### Format of IDDs
+When rendering programs as IDDs using `idd_pdf`, node labels take the form `xi?`
+or `xi!`. Here `x` is the field name and `i` is the bit being inspected. The symbol
+`?` indicates that the bit is being tested to equal 0, so `xi?` is equivalent to
+`xi=1`.

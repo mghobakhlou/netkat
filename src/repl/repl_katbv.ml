@@ -182,7 +182,6 @@ let get_idd ?(p=(fst !policy)) ?(mgr=Idd.manager ()) () =
   in
   (Katbv_lib.Compiler.to_idd ~mgr ~map_var p, tbl, mgr)
 
-
 let get_var_name tbl var =
     Format.sprintf "%s%s"
       (Hashtbl.find_exn tbl (Var.index var))
