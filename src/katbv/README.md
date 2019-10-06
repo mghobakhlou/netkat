@@ -15,7 +15,8 @@ A Boolean vector is a string s<sub>1</sub>s<sub>2</sub>...s<sub>n</sub> where
 s<sub>i</sub> is either 0 or 1. The vector is interpreted as a binary number 
 with the rightmost bit as the low bit at the leftmost bit as the top bit. Thus
 the Boolean vector 110 is interpreted as 6. In particular the index of s<sub>i</sub>
-is n-i.
+is n-i. The vector is identified with a string name called a field. We mostly use
+`x` and `y` to denote fields.
 
 The parser recognizes the following syntax for KAT+BV Boolean expressions
 - `T` `F` -- "True" "False" respectively
@@ -29,7 +30,10 @@ binary numbers. One can also simply write `x<=[b]` which is parsed as `0<=x<=[b]
 The parser recognizes the following syntax for KAT+BV expressions
 - `[Boolean expression]`
 - `x:=[mask]` where `[mask]` is a string of `{1,0,?}` indicating which bits to 
-update in `x`. For example `x:=0???` updates the fourth bit to be a 0.
+update in `x`. For example `x:=0???` updates the fourth bit to be a 0. Note that
+higher, unspecified bits are interpreted as `?`. So for example if `y` has 3 bits
+then `y:=0` is interpreted as `y:=??0`. To update `y` to the all 0 vector one would
+write `y:=000`.
 - `p+q` `p;q` `p*` -- union sequence Kleene star respectively
 - `if [Boolean expression] then [expression] else [expression]` -- 
 `if b then e1 else e2` is parsed as `b;e1+~b;e2`.
@@ -89,3 +93,9 @@ When rendering programs as IDDs using `idd_pdf`, node labels take the form `xi?`
 or `xi!`. Here `x` is the field name and `i` is the bit being inspected. The symbol
 `?` indicates that the bit is being tested to equal 0, so `xi?` is equivalent to
 `xi=1`.
+
+
+### Evaluation
+The command `eval` evaluates the current policy on the specified field values. The
+command is followed by specifying values of certain fields. Any unspecified fields
+default to the all 0 vector. 
