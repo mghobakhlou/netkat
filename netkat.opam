@@ -8,6 +8,7 @@ build: [
 ]
 maintainer: ["Steffen Smolka <smolka@cs.cornell.edu>"]
 authors: [
+  "Caleb Koch <cak247@cornell.edu>"
   "Steffen Smolka <smolka@cs.cornell.edu>"
   "Nate Foster <jnfoster@cs.cornell.edu>"
 ]
