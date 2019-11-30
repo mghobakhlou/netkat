@@ -5,7 +5,11 @@
 (name netkat)
 (source (github netkat-lang/netkat))
 (license MIT)
-(authors "Steffen Smolka <smolka@cs.cornell.edu>" "Nate Foster <jnfoster@cs.cornell.edu>")
+(authors
+  "Caleb Koch <cak247@cornell.edu>"
+  "Steffen Smolka <smolka@cs.cornell.edu>"
+  "Nate Foster <jnfoster@cs.cornell.edu>"
+)
 (maintainers "Steffen Smolka <smolka@cs.cornell.edu>")
 
 (package
@@ -22,7 +26,7 @@
     (odoc :with-doc)
     (open (>= 0))
     (nice_parser (<> 0))
-    (idds (<> 0))
+    (idd (<> 0))
     (ppx_deriving (>= 4.3))
     (ppx_inline_test (and :with-test (>= v0.12.0)))
     (ppx_jane (>= v0.12.0))
