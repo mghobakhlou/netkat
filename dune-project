@@ -11,10 +11,12 @@
   "Nate Foster <jnfoster@cs.cornell.edu>"
 )
 (maintainers "Steffen Smolka <smolka@cs.cornell.edu>")
+(documentation "https://netkat-lang.github.io/netkat/")
 
 (package
   (name netkat)
   (synopsis "A clean slate implementation of NetKAT")
+  (description "A clean slate implementation of NetKAT")
   (depends
     (async (>= 0.12.0))
     (ocaml (>= 4.07.0))
