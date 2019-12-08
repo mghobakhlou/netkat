@@ -279,7 +279,7 @@ let eval (env, env_str) =
     List.map lst ~f:(fun (a,b) ->
       printf "%s=%s\n%!" a b
     )
-  ) : unit)
+  ) : unit list list)
 
 
 let equiv (p1, s1) (p2, s2) = 
