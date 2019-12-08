@@ -20,7 +20,7 @@
   (depends
     (async (>= 0.12.0))
     (ocaml (>= 4.07.0))
-    (dune (and :build (>= 1.10)))
+    (dune (>= 1.10))
     (menhir (and :build (>= 20190626)))
     (base (>= v0.12.0))
     (core (>= v0.12.0))
