@@ -191,4 +191,4 @@ let render ?(var_name=Var.to_string) tbl =
   let out = Stdio.Out_channel.create output_file in
   Stdio.Out_channel.output_string out (to_string_doc box);
   Stdio.Out_channel.close out;
-  Open.in_default_app output_file |> ignore
+  ignore (Open.in_default_app output_file : bool)

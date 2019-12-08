@@ -125,7 +125,7 @@ end
 
 
 let run cmd =
-  ignore (cmd ());
+  ignore (cmd () : unit);
   never_returns (Async.Scheduler.go ())
 
 

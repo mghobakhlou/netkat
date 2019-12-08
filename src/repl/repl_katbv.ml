@@ -272,15 +272,15 @@ let load_file filename =
 let eval (env, env_str) =
   show_policy ();
   printf "evaluated on %s yields:\n" env_str;
-  Katbv_lib.Semantics.eval ~env (fst !policy)
+  ignore (Katbv_lib.Semantics.eval ~env (fst !policy)
   |> Katbv_lib.Semantics.to_str_lst
   |> List.map ~f:(fun lst ->
     printf "-----------------\n";
     List.map lst ~f:(fun (a,b) ->
       printf "%s=%s\n%!" a b
     )
-  )
-  |> ignore
+  ) : unit)
+
 
 let equiv (p1, s1) (p2, s2) = 
   let idd1, _, mgr = get_idd ~p:p1 () in
