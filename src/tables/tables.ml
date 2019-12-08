@@ -170,8 +170,8 @@ let to_string_doc b =
 (** [render_box tbl] is the [PrintBox.t] object representing [tbl] *)
 let render_box var_name tbl =
   let matrix = Array.make_matrix ~dimy:2 ~dimx:(1+(List.length tbl)) "" in
-  let _ = matrix.(0).(0) <- "Pattern"; matrix.(0).(1) <- "Actions" in
-  let _ = List.iteri tbl ~f:(fun i (p,a) ->
+  let _ : unit = matrix.(0).(0) <- "Pattern"; matrix.(0).(1) <- "Actions" in
+  let _ : unit = List.iteri tbl ~f:(fun i (p,a) ->
     matrix.(i+1).(0) <- (to_str_lst p "=" var_name);
     matrix.(i+1).(1) <- (to_str_act var_name a)
   )

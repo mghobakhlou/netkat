@@ -321,5 +321,4 @@ let rec repl () =
 let main () : unit =
   printf "Welcome to the KAT+BV REPL!\n";
   printf "Type `help` for a list of commands\n";
-  let _ = repl () in
-  ()
+  ignore (repl () : 'a Deferred.t)
