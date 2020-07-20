@@ -29,7 +29,7 @@ let compare_vars v v' =
 
 (** [intersect lst tbl] returns a forwarding table computed from all possible 
     intersections of rows in [lst] *)
-let rec intersect (lst:t) (tbl:tbl) =
+let intersect (lst:t) (tbl:tbl) =
   let rec build_intersections to_be_intersected rules lst =
     match lst with
     | [] ->
@@ -71,10 +71,10 @@ let to_table (idd:Idd.t) =
         | Some s -> Set.union s set
       )
     | False -> ()
-    | Branch { var; hi; lo } when Var.is_inp var -> 
+    | Branch { var; hi; lo; _ } when Var.is_inp var -> 
       (to_tables hi ((var, true)::pattern) rule);
       (to_tables lo ((var, false)::pattern) rule)
-    | Branch { var; hi; lo } (* var is output *) ->
+    | Branch { var; hi; lo; _ } (* var is output *) ->
       (to_tables hi pattern ((var, true)::rule));
       (to_tables lo pattern ((var, false)::rule))
     in

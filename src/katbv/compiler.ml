@@ -23,7 +23,7 @@ let test v i bl =
 let build_test v z n = 
   let h (bl:bool) (i:int) : Katbb_lib.Ast.bexp = 
     Kat.Ast.Test (test v i bl) in
-  Bitstring.build_term_list v z n h
+  Bitstring.build_term_list z n h
   |> Kat.Optimize.big_conj
 
 let map_test = function
@@ -34,7 +34,7 @@ let map_test = function
 
 let map_act (v, z, n) = 
   let h (bl:bool) (i:int) : Katbb_lib.Ast.exp = Kat.Ast.Action (test v i bl) in
-  Bitstring.build_term_list v z n h
+  Bitstring.build_term_list z n h
   |> Kat.Optimize.big_seq
 
 let to_bexp_katbb = Kat.Hom.map_bexp ~ba ~map_test

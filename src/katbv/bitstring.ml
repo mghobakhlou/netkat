@@ -22,7 +22,7 @@ module T = struct
 
   let xor (t1:t) (t2:t) = 
     let smaller, larger = 
-      if Hashtbl.(max_exn t1 > max_exn t2) then t2, t1 else t1, t2 in
+      if (max_exn t1 > max_exn t2) then t2, t1 else t1, t2 in
     Hashtbl.filteri larger ~f:(fun ~key ~data:() -> not (Hashtbl.mem smaller key))
 
   let compare v1 v2 = 
@@ -160,7 +160,7 @@ let upper_bound (v:string) (b:t) : Katbb_lib.Ast.bexp =
   | None -> build_clause v b 0 [] false
   | Some m -> build_clause v b m lst false
 
-let build_term_list (v:string) (z:t) (n:t) h =
+let build_term_list (z:t) (n:t) h =
   let m = Int.max (max_exn z) (max_exn n)
   in
   build_list [] 0 (m+1) ~f:(fun i -> 

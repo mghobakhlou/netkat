@@ -67,10 +67,9 @@ val lower_bound : string -> t -> Katbb_lib.Ast.bexp
     iff [v]<=[b] where [s] is the variable name *)
 val upper_bound : string -> t ->  Katbb_lib.Ast.bexp
 
-(** [build_term_list s z n] is KAT+B! Boolean expression that is satisfied by [s:=v]
-    iff [v_i=0] for all i such that [z_i=1] and [v_i=1] for all i such that 
-    [n_i=1] *)
-val build_term_list : string -> t -> t -> 
+(** [build_term_list z n h] is a list with elements [h false i] for all i such 
+    that [z_i=1] and elements [h true i] for all i such that [n_i=1] *)
+val build_term_list : t -> t -> 
   (bool -> int -> 'a) -> 'a list
 
 (** {2 Rendering} *)

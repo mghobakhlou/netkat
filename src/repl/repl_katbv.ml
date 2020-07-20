@@ -55,12 +55,8 @@ module Parser = struct
 
   module Tokens = MParser_RE.Tokens
 
-  (* Mostly useless error message for parsing policies *)
-  let string_of_position (p : Lexing.position) : string =
-    sprintf "%s:%d:%d" p.pos_fname p.pos_lnum (p.pos_cnum - p.pos_bol)
-
   (* Use the netkat parser to parse policies *)
-  let parse_policy ?(name = "") (pol_str : string) : (policy, string) Result.t =
+  let parse_policy (pol_str : string) : (policy, string) Result.t =
     Ok (Katbv_lib.Parser.parse_string pol_str)
 
 
@@ -218,7 +214,7 @@ let show_table_text () =
 let parse_command (line : string) : command option =
   match (MParser.parse_string Parser.command line []) with
   | Success command -> Some command
-  | Failed (msg, e) -> (print_endline msg; None)
+  | Failed (msg, _) -> (print_endline msg; None)
 
 let help =
   String.concat ~sep:"\n\t" [

@@ -73,11 +73,11 @@ let rec eval ~env (exp:exp) =
   | Action act -> eval_act env act
   | Union (e1, e2) -> Set.union (eval ~env e1) (eval ~env e2)
   | Seq (e1, e2) -> Set.fold (eval ~env e1) ~init:(Set.empty (module Env))
-    ~f:(fun set env' -> Set.union set (eval env' e2))
+    ~f:(fun set env' -> Set.union set (eval ~env:env' e2))
   | Star e -> 
     let rec loop acc =
       let acc' = Set.fold acc ~init:acc ~f:(fun set env' ->
-        Set.union set (eval env' e)
+        Set.union set (eval ~env:env' e)
       ) in
       if Set.equal acc acc' then acc else loop acc'
     in
