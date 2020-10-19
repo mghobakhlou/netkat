@@ -83,7 +83,7 @@ let ( -- ) (t1:t) (t2:t) =
 
 let is_zero = Hashtbl.is_empty
 
-let equal (t1:t) (t2:t) = Hashtbl.equal t1 t2 (fun () () -> true)
+let equal (t1:t) (t2:t) = Hashtbl.equal (fun () () -> true) t1 t2
 
 let min (t:t) = 
   Hash_set.(min_elt ~compare:compare_int (of_hashtbl_keys t))

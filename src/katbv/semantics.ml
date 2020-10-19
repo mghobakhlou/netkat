@@ -6,7 +6,7 @@ module Env = struct
   module T = struct
     type t = Bitstring.t Hashtbl.M(String).t [@@deriving sexp]
     let compare t1 t2 =
-      if Hashtbl.equal t1 t2 Bitstring.equal then 0
+      if Hashtbl.equal Bitstring.equal t1 t2 then 0
       else 
         let cmp = compare_int (Hashtbl.length t1) (Hashtbl.length t2) in
         if cmp > 0 then cmp else ~-1
